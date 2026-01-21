@@ -6,4 +6,4 @@
 
 ## 🍇ERD
 🔗https://www.erdcloud.com/d/jALxp5uTuERwH7xqo
-<img alt="Image" src="https://github.com/user-attachments/assets/9b109695-d6af-4170-b35f-4e8b45ddcf96" style="max-width:100%; height:auto; display:block;"/>
+<img alt="Image" src="https://github.com/user-attachments/assets/b6d0e8a5-43bd-4cce-9bfb-458b9859089b" style="max-width:100%; height:auto; display:block;"/>
