@@ -19,7 +19,19 @@ public class OrderCommendService {
 		int totalMenuAmount = req.items().stream()
 			.mapToInt(i -> i.unitPrice() * i.quantity()).sum();
 
-		// 이벤트 생성
+		OrderCreatedEvent event = new OrderCreatedEvent(
+			orderId,
+			req.accountId(),
+			req.storeId(),
+			new OrderCreatedEvent.Address(req.addrRoad(), req.addrDetail()),
+			req.requestToStore(),
+			req.requestToRider(),
+			req.items().stream()
+				.map(i -> new OrderCreatedEvent.Item(i.menuId(), i.menuName(), i.unitPrice(), i.quantity()))
+				.toList(),
+			req.deliveryFee(),
+			totalMenuAmount
+		);
 
 		// 이벤트 저장
 
