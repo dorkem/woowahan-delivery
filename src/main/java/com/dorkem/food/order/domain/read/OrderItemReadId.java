@@ -1,4 +1,4 @@
-package com.dorkem.food.order.domain;
+package com.dorkem.food.order.domain.read;
 
 import java.io.Serializable;
 import java.util.Objects;

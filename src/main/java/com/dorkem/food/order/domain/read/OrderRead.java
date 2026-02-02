@@ -1,4 +1,4 @@
-package com.dorkem.food.order.domain;
+package com.dorkem.food.order.domain.read;
 
 import jakarta.persistence.*;
 

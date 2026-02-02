@@ -1,4 +1,4 @@
-package com.dorkem.food.order.domain.event;
+package com.dorkem.food.order.common.event;
 
 import java.util.List;
 

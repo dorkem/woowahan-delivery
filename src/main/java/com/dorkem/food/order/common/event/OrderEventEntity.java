@@ -1,4 +1,4 @@
-package com.dorkem.food.order.domain;
+package com.dorkem.food.order.common.event;
 
 import jakarta.persistence.*;
 
