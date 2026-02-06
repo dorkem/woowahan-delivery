@@ -1,21 +1,27 @@
 package com.dorkem.food.order.common.event;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import com.dorkem.food.order.common.model.OrderStatus;
 
 public record OrderCreatedEvent(
 	String orderId,
 	Long accountId,
 	Long storeId,
-	Address address,
+	DeliveryInfo deliveryInfo,
 	String requestToStore,
 	String requestToRider,
-	List<Item> items,
+	Integer totalMenuAmount,
 	Integer deliveryFee,
-	Integer totalMenuAmount
-) {
-	public record Address(String road, String detail) {
+	List<OrderItem> items,
+
+	OrderStatus status,
+	LocalDateTime createdAt
+) implements DomainEvent {
+	public record DeliveryInfo(String address, String addressDetail, String phoneNumber) {
 	}
 
-	public record Item(Long menuId, String menuName, Integer unitPrice, Integer quantity) {
+	public record OrderItem(Long menuId, String menuName, Integer quantity, Integer unitPrice, List<String> options) {
 	}
 }
