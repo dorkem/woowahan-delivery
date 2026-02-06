@@ -1,8 +1,10 @@
 package com.dorkem.food.order.query.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import com.dorkem.food.order.domain.read.OrderRead;
+import com.dorkem.food.order.query.model.OrderReadEntity;
 
-public interface OrderReadRepository extends JpaRepository<OrderRead, String> {
+@Repository
+public interface OrderReadRepository extends JpaRepository<OrderReadEntity, String> {
 }
