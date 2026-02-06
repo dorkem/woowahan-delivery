@@ -29,6 +29,7 @@ public class OrderCommandController {
 		String orderId = UUID.randomUUID().toString();
 
 		// 주문 생성
+		// 많아지면 mapper로 변경
 		CreateOrderCommand command = getCommand(request, orderId);
 
 		orderCommandHandler.handle(command);
