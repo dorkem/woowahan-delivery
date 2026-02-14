@@ -1,4 +1,4 @@
-package com.dorkem.food.user;
+package com.dorkem.food.user.entity;
 
 import java.time.LocalDateTime;
 
