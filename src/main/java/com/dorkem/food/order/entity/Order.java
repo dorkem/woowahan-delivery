@@ -7,6 +7,8 @@ import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.user.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,9 +38,15 @@ public class Order {
 	@OneToMany
 	private List<OrderItem> orderItem;
 
+	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus;
 
+	private String address;
+	private String addressDetail;
+	private String userPhoneNumber;
 	private String requestToStore;
 	private String requestToRider;
-	private LocalDateTime createAt;
+	private boolean noCutlery; // 수저 안 받기
+	private boolean noSideDish; // 기본반찬 안 받기
+	private LocalDateTime createdAt;
 }
