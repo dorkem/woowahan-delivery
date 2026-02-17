@@ -9,6 +9,8 @@ import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +43,10 @@ public class Store {
 	private String storeAddressDetails;
 	private BigDecimal latitude;
 	private BigDecimal longitude;
+
+	@Enumerated(EnumType.STRING)
 	private StoreStatus status;
+
 	private LocalTime openTime;
 	private LocalTime closeTime;
 	private int minOrderAmount;

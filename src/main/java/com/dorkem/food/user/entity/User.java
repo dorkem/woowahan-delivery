@@ -3,6 +3,8 @@ package com.dorkem.food.user.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +23,10 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long userId;
 
+	@Enumerated(EnumType.STRING)
 	private LoginType loginType;
+
+	@Enumerated(EnumType.STRING)
 	private UserType userType;
 	private String email;
 	private String username;

@@ -7,6 +7,7 @@ import com.dorkem.food.order.dto.DeliveryAddressRequest;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.user.entity.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -36,7 +37,7 @@ public class Order {
 	@ManyToOne
 	private User user;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems;
 
 	@Enumerated(EnumType.STRING)
