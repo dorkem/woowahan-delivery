@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import com.dorkem.food.order.entity.Order;
-import com.dorkem.food.user.User;
+import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

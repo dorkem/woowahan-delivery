@@ -27,6 +27,17 @@ public class OrderItem {
 
 	@ManyToOne
 	private Menu menu;
+
+	private String menuName;
 	private int orderPrice;
 	private int quantity;
+
+	public static OrderItem createOrderItem(Menu menu, int quantity) {
+		return OrderItem.builder()
+			.menu(menu)
+			.menuName(menu.getMenuName())
+			.orderPrice(menu.getPrice())
+			.quantity(quantity)
+			.build();
+	}
 }

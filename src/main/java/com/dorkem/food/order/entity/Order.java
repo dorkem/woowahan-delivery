@@ -3,8 +3,9 @@ package com.dorkem.food.order.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.dorkem.food.order.dto.DeliveryAddressRequest;
 import com.dorkem.food.store.entity.Store;
-import com.dorkem.food.user.User;
+import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,7 +37,7 @@ public class Order {
 	private User user;
 
 	@OneToMany
-	private List<OrderItem> orderItem;
+	private List<OrderItem> orderItems;
 
 	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus;
@@ -46,7 +47,33 @@ public class Order {
 	private String userPhoneNumber;
 	private String requestToStore;
 	private String requestToRider;
+	String entranceAccessPassword;
+	String deliveryDirections;
 	private boolean noCutlery; // 수저 안 받기
 	private boolean noSideDish; // 기본반찬 안 받기
 	private LocalDateTime createdAt;
+
+	public static Order createOrder(Store store, User user, List<OrderItem> orderItems,
+		DeliveryAddressRequest deliveryAddressRequest, String requestToStore,
+		boolean noCutlery, boolean noSideDish
+	) {
+		Order order = Order.builder()
+			.store(store)
+			.user(user)
+			.orderItems(orderItems)
+			.orderStatus(OrderStatus.CREATED)
+			.address(deliveryAddressRequest.address())
+			.addressDetail(deliveryAddressRequest.addressDetail())
+			.userPhoneNumber(user.getPhoneNumber())
+			.requestToRider(deliveryAddressRequest.requestToRider())
+			.requestToStore(requestToStore)
+			.entranceAccessPassword(deliveryAddressRequest.entranceAccessPassword())
+			.deliveryDirections(deliveryAddressRequest.deliveryDirections())
+			.noCutlery(noCutlery)
+			.noSideDish(noSideDish)
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		return order;
+	}
 }
