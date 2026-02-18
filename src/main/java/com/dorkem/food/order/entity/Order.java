@@ -1,6 +1,7 @@
 package com.dorkem.food.order.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.dorkem.food.order.dto.DeliveryAddressRequest;
@@ -38,8 +39,8 @@ public class Order {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	private List<OrderItem> orderItems;
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus;
