@@ -10,13 +10,11 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "order_item")
+@Getter @Setter
 public class OrderItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +31,11 @@ public class OrderItem {
 	private int quantity;
 
 	public static OrderItem createOrderItem(Menu menu, int quantity) {
-		return OrderItem.builder()
-			.menu(menu)
-			.menuName(menu.getMenuName())
-			.orderPrice(menu.getPrice())
-			.quantity(quantity)
-			.build();
+		OrderItem orderItem = new OrderItem();
+		orderItem.setMenu(menu);
+		orderItem.setQuantity(quantity);
+		orderItem.setMenuName(menu.getMenuName());
+		orderItem.setOrderPrice(menu.getPrice());
+		return orderItem;
 	}
 }
