@@ -41,4 +41,8 @@ public class OrderItem {
 		orderItem.setOrderPrice(menu.getPrice());
 		return orderItem;
 	}
+
+	public int getTotalPrice() {
+		return getMenu().getPrice() * getQuantity();
+	}
 }

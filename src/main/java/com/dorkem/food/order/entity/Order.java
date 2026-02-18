@@ -97,4 +97,12 @@ public class Order {
 		// 배송 완료된 상태면 삭제불가능
 		this.setOrderStatus(OrderStatus.CANCELLED);
 	}
+
+	public int getTotalPrice() {
+		int price = 0;
+		for (OrderItem orderItem : orderItems) {
+			price += orderItem.getTotalPrice();
+		}
+		return price;
+	}
 }
