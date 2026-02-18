@@ -92,4 +92,9 @@ public class Order {
 		order.setCreatedAt(LocalDateTime.now());
 		return order;
 	}
+
+	public void cancelOrder() {
+		// 배송 완료된 상태면 삭제불가능
+		this.setOrderStatus(OrderStatus.CANCELLED);
+	}
 }

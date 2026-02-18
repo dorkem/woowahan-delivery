@@ -55,6 +55,13 @@ public class OrderService {
 		return order.getOrderId();
 	}
 
+	@Transactional
+	public void cancelOrder(String orderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));
+		order.cancelOrder();
+	}
+
 	private List<OrderItem> getOrderItem(List<OrderItemRequest> request) {
 		List<OrderItem> orderItems = new ArrayList<>();
 
