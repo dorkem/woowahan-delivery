@@ -1,5 +1,7 @@
 package com.dorkem.food.order.controller;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,11 +21,13 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@PostMapping
-	public ResponseEntity<Void> createOrder(
+	public ResponseEntity<Map<String, String>> createOrder(
 		@RequestBody OrderCreateRequest request
 	) {
 		Long userId = 1L; // 나중에 로그인 정보에서 추출
-		orderService.createOrder(userId, request);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		String orderId = orderService.createOrder(userId, request);
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(Map.of("orderId", orderId));
 	}
 }

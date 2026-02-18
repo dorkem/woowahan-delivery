@@ -30,7 +30,7 @@ public class OrderService {
 	private final MenuRepository menuRepository;
 
 	@Transactional
-	public void createOrder(Long userId, OrderCreateRequest request) {
+	public String createOrder(Long userId, OrderCreateRequest request) {
 		User user = getUser(userId);
 		Store store = getStore(request);
 		List<OrderItem> orderItems = getOrderItem(request.items());
@@ -51,6 +51,8 @@ public class OrderService {
 		);
 
 		orderRepository.save(order);
+
+		return order.getOrderId();
 	}
 
 	private List<OrderItem> getOrderItem(List<OrderItemRequest> request) {
