@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.menu.repository.MenuRepository;
+import com.dorkem.food.order.dto.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.OrderCreateRequest;
 import com.dorkem.food.order.dto.OrderItemRequest;
 import com.dorkem.food.order.entity.Order;
@@ -27,19 +29,23 @@ public class OrderService {
 	private final UserRepository userRepository;
 	private final MenuRepository menuRepository;
 
+	@Transactional
 	public void createOrder(Long userId, OrderCreateRequest request) {
 		User user = getUser(userId);
-
 		Store store = getStore(request);
-
 		List<OrderItem> orderItems = getOrderItem(request.items());
 
+		DeliveryAddressRequest deliveryInfo = request.deliveryAddressRequest();
 		Order order = Order.createOrder(
 			store,
 			user,
 			orderItems,
-			request.deliveryAddressRequest(),
+			deliveryInfo.address(),
+			deliveryInfo.addressDetail(),
 			request.requestToStore(),
+			deliveryInfo.requestToRider(),
+			deliveryInfo.entranceAccessPassword(),
+			deliveryInfo.deliveryDirections(),
 			request.noCutlery(),
 			request.noSideDish()
 		);

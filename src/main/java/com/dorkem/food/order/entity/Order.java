@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dorkem.food.order.dto.DeliveryAddressRequest;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.user.entity.User;
 
@@ -56,27 +55,41 @@ public class Order {
 	private boolean noSideDish; // 기본반찬 안 받기
 	private LocalDateTime createdAt;
 
-	public static Order createOrder(Store store, User user, List<OrderItem> orderItems,
-		DeliveryAddressRequest deliveryAddressRequest, String requestToStore,
-		boolean noCutlery, boolean noSideDish
-	) {
-		Order order = Order.builder()
-			.store(store)
-			.user(user)
-			.orderItems(orderItems)
-			.orderStatus(OrderStatus.CREATED)
-			.address(deliveryAddressRequest.address())
-			.addressDetail(deliveryAddressRequest.addressDetail())
-			.userPhoneNumber(user.getPhoneNumber())
-			.requestToRider(deliveryAddressRequest.requestToRider())
-			.requestToStore(requestToStore)
-			.entranceAccessPassword(deliveryAddressRequest.entranceAccessPassword())
-			.deliveryDirections(deliveryAddressRequest.deliveryDirections())
-			.noCutlery(noCutlery)
-			.noSideDish(noSideDish)
-			.createdAt(LocalDateTime.now())
-			.build();
+	public void addOrderItem(OrderItem orderItem) {
+		orderItems.add(orderItem);
+		orderItem.setOrder(this);
+	}
 
+	public static Order createOrder(
+		Store store,
+		User user,
+		List<OrderItem> orderItems,
+		String address,
+		String addressDetail,
+		String requestToStore,
+		String requestToRider,
+		String entranceAccessPassword,
+		String deliveryDirections,
+		boolean noCutlery,
+		boolean noSideDish
+	) {
+		Order order = new Order();
+		order.setStore(store);
+		order.setUser(user);
+		for (OrderItem orderItem : orderItems) {
+			order.addOrderItem(orderItem);
+		}
+		order.setOrderStatus(OrderStatus.CREATED);
+		order.setAddress(address);
+		order.setAddressDetail(addressDetail);
+		order.setUserPhoneNumber(user.getPhoneNumber());
+		order.setRequestToRider(requestToRider);
+		order.setRequestToStore(requestToStore);
+		order.setEntranceAccessPassword(entranceAccessPassword);
+		order.setDeliveryDirections(deliveryDirections);
+		order.setNoCutlery(noCutlery);
+		order.setNoSideDish(noSideDish);
+		order.setCreatedAt(LocalDateTime.now());
 		return order;
 	}
 }
