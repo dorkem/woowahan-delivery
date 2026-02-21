@@ -16,7 +16,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "order_item")
-@Getter @Setter
+@Getter
+@Setter
 public class OrderItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +51,6 @@ public class OrderItem {
 	}
 
 	public int getTotalPrice() {
-		return getMenu().getPrice() * getQuantity();
+		return this.orderPrice * this.quantity;
 	}
 }
