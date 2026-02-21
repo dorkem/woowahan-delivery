@@ -8,12 +8,15 @@ import java.util.List;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.user.entity.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -26,27 +29,50 @@ import lombok.Setter;
 public class Store {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "store_id")
 	private Long storeId;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_id", nullable = false)
 	private User owner;
 
-	@OneToMany
+	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
 
+	@Column(name = "store_name", nullable = false)
 	private String storeName;
+
+	@Column(name = "business_number", nullable = false)
 	private String businessNumber;
+
+	@Column(name = "store_address", nullable = false)
 	private String storeAddress;
+
+	@Column(name = "store_address_details", nullable = false)
 	private String storeAddressDetails;
+
+	@Column(name = "latitude", precision = 13, scale = 10)
 	private BigDecimal latitude;
+
+	@Column(name = "longitude", precision = 13, scale = 10)
 	private BigDecimal longitude;
 
 	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
 	private StoreStatus status;
 
+	@Column(name = "open_time")
 	private LocalTime openTime;
+
+	@Column(name = "close_time")
 	private LocalTime closeTime;
+
+	@Column(name = "min_order_amount", nullable = false)
 	private int minOrderAmount;
+
+	@Column(name = "base_delivery_fee", nullable = false)
 	private int baseDeliveryFee;
+
+	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 }

@@ -8,6 +8,7 @@ import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,7 @@ import lombok.Setter;
 public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "order_id")
 	private String orderId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -42,17 +44,37 @@ public class Order {
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
+	@Column(name = "order_status", nullable = false)
 	private OrderStatus orderStatus;
 
+	@Column(name = "address", nullable = false)
 	private String address;
+
+	@Column(name = "address_detail", nullable = false)
 	private String addressDetail;
+
+	@Column(name = "user_phone_number", nullable = false)
 	private String userPhoneNumber;
+
+	@Column(name = "request_to_store")
 	private String requestToStore;
+
+	@Column(name = "request_to_rider")
 	private String requestToRider;
+
+	@Column(name = "entrance_access_password")
 	String entranceAccessPassword;
+
+	@Column(name = "delivery_directions")
 	String deliveryDirections;
+
+	@Column(name = "no_cutlery", nullable = false)
 	private boolean noCutlery; // 수저 안 받기
+
+	@Column(name = "no_side_dish", nullable = false)
 	private boolean noSideDish; // 기본반찬 안 받기
+
+	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
 	public void addOrderItem(OrderItem orderItem) {

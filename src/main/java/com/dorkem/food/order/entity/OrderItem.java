@@ -2,6 +2,7 @@ package com.dorkem.food.order.entity;
 
 import com.dorkem.food.menu.entity.Menu;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ import lombok.Setter;
 public class OrderItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "order_item_id")
 	private Long orderItemId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -29,8 +31,13 @@ public class OrderItem {
 	@JoinColumn(name = "menu_id")
 	private Menu menu;
 
+	@Column(name = "menu_name", nullable = false)
 	private String menuName;
+
+	@Column(name = "order_price", nullable = false)
 	private int orderPrice;
+
+	@Column(name = "quantity", nullable = false)
 	private int quantity;
 
 	public static OrderItem createOrderItem(Menu menu, int quantity) {

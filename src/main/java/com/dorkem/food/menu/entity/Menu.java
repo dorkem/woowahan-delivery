@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.dorkem.food.store.entity.Store;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,15 +20,27 @@ import lombok.Setter;
 public class Menu {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "menu_id")
 	private Long menuId;
 
 	@ManyToOne
 	private Store store;
 
+	@Column(name = "menu_name", nullable = false)
 	private String menuName;
+
+	@Column(name = "menu_description")
 	private String menuDescription;
+
+	@Column(name = "price", nullable = false)
 	private int price;
+
+	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
+
+	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+
+	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 }
