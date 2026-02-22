@@ -27,6 +27,8 @@ import lombok.Setter;
 @Table(name = "stores")
 @Getter @Setter
 public class Store {
+	//TODO: 공통관심사끼리 embedded로 묶기
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "store_id")

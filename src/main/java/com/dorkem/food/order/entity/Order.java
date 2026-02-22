@@ -82,6 +82,7 @@ public class Order {
 		orderItem.setOrder(this);
 	}
 
+	//TODO: 공통관심사끼리 embedded로 묶기
 	public static Order createOrder(
 		Store store,
 		User user,
@@ -115,6 +116,7 @@ public class Order {
 		return order;
 	}
 
+	//TODO: 상태 변경 테이블을 통한 히스토리를 관리하도록 구현
 	public void cancelOrder() {
 		// 배송 완료된 상태면 삭제불가능
 		this.setOrderStatus(OrderStatus.CANCELLED);
