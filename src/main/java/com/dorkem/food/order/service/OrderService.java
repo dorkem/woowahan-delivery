@@ -62,7 +62,17 @@ public class OrderService {
 		order.cancelOrder();
 	}
 
-	private List<OrderItem> getOrderItem(List<OrderCreateItemRequest> request) {
+	private User getUser(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+	}
+
+	private Store getStore(OrderCreateRequest request) {
+		return storeRepository.findById(request.storeId())
+			.orElseThrow(() -> new IllegalArgumentException("해당 가게를 찾을 수 없습니다."));
+	}
+
+	private List<OrderItem> getOrderItems(List<OrderCreateItemRequest> request) {
 		List<OrderItem> orderItems = new ArrayList<>();
 
 		for (OrderCreateItemRequest itemReq : request) {
@@ -73,15 +83,5 @@ public class OrderService {
 		}
 
 		return orderItems;
-	}
-
-	private Store getStore(OrderCreateRequest request) {
-		return storeRepository.findById(request.storeId())
-			.orElseThrow(() -> new IllegalArgumentException("해당 가게를 찾을 수 없습니다."));
-	}
-
-	private User getUser(Long userId) {
-		return userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 	}
 }
