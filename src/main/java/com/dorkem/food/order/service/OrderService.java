@@ -33,7 +33,7 @@ public class OrderService {
 	public String createOrder(Long userId, OrderCreateRequest request) {
 		User user = getUser(userId);
 		Store store = getStore(request);
-		List<OrderItem> orderItems = getOrderItem(request.items());
+		List<OrderItem> orderItems = getOrderItems(request.items());
 
 		DeliveryAddressRequest deliveryInfo = request.deliveryAddressRequest();
 		Order order = Order.createOrder(
