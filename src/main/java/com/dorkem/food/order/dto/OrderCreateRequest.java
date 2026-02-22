@@ -11,7 +11,7 @@ public record OrderCreateRequest(
 	Long storeId,
 
 	@Schema(description = "주문한 음식 목록")
-	List<OrderItemRequest> items,
+	List<OrderCreateItemRequest> items,
 
 	@Schema(description = "사용자 배달 주소 정보")
 	DeliveryAddressRequest deliveryAddressRequest,

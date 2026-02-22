@@ -3,7 +3,7 @@ package com.dorkem.food.order.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "주문한 메뉴 요청 정보")
-public record OrderItemRequest(
+public record OrderCreateItemRequest(
 
 	@Schema(description = "메뉴 ID")
 	Long menuId,

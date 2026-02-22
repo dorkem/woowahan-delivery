@@ -10,7 +10,7 @@ import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.menu.repository.MenuRepository;
 import com.dorkem.food.order.dto.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.OrderCreateRequest;
-import com.dorkem.food.order.dto.OrderItemRequest;
+import com.dorkem.food.order.dto.OrderCreateItemRequest;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderItem;
 import com.dorkem.food.order.repository.OrderRepository;
@@ -62,10 +62,10 @@ public class OrderService {
 		order.cancelOrder();
 	}
 
-	private List<OrderItem> getOrderItem(List<OrderItemRequest> request) {
+	private List<OrderItem> getOrderItem(List<OrderCreateItemRequest> request) {
 		List<OrderItem> orderItems = new ArrayList<>();
 
-		for (OrderItemRequest itemReq : request) {
+		for (OrderCreateItemRequest itemReq : request) {
 			Menu menu = menuRepository.findById(itemReq.menuId())
 				.orElseThrow(() -> new IllegalArgumentException("메뉴 정보를 찾을 수 없습니다."));
 

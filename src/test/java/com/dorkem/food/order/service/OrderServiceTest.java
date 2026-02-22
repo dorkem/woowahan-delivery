@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.order.dto.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.OrderCreateRequest;
-import com.dorkem.food.order.dto.OrderItemRequest;
+import com.dorkem.food.order.dto.OrderCreateItemRequest;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderStatus;
 import com.dorkem.food.order.repository.OrderRepository;
@@ -63,9 +63,9 @@ class OrderServiceTest {
 			"서울시 금천구", "123호", "-", "-", "-"
 		);
 
-		List<OrderItemRequest> itemRequests = new ArrayList<>();
-		itemRequests.add(new OrderItemRequest(bbulingCle.getMenuId(), 1));
-		itemRequests.add(new OrderItemRequest(cheeseBall.getMenuId(), 2));
+		List<OrderCreateItemRequest> itemRequests = new ArrayList<>();
+		itemRequests.add(new OrderCreateItemRequest(bbulingCle.getMenuId(), 1));
+		itemRequests.add(new OrderCreateItemRequest(cheeseBall.getMenuId(), 2));
 
 		OrderCreateRequest request = new OrderCreateRequest(
 			store.getStoreId(),
