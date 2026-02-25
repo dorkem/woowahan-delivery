@@ -59,6 +59,18 @@ public class OrderService {
 	}
 
 	@Transactional
+	public void acceptOrder(String orderId) {
+		Order order = getOrder(orderId);
+		order.acceptOrder();
+	}
+
+	@Transactional
+	public void startDelivery(String orderId) {
+		Order order = getOrder(orderId);
+		order.startDelivery();
+	}
+
+	@Transactional
 	public void cancelOrder(String orderId) {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));

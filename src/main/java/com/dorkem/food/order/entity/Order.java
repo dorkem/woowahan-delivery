@@ -53,6 +53,9 @@ public class Order {
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
 
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	private List<OrderStatusHistory> orderStatusHistories = new ArrayList<>();
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", nullable = false)
 	private OrderStatus orderStatus;
@@ -90,10 +93,28 @@ public class Order {
 		return order;
 	}
 
-	//TODO: 상태 변경 테이블을 통한 히스토리를 관리하도록 구현
+	public void acceptOrder() {
+		this.changeStatus(OrderStatus.PREPARING);
+	}
+
+	public void startDelivery() {
+		this.changeStatus(OrderStatus.DELIVERING);
+	}
+
 	public void cancelOrder() {
-		// 배송 완료된 상태면 삭제불가능
-		this.setOrderStatus(OrderStatus.CANCELLED);
+		// 배달, 완료는 못함
+		this.changeStatus(OrderStatus.CANCELLED);
+	}
+
+	private void changeStatus(OrderStatus newStatus) {
+		this.orderStatus = newStatus;
+		OrderStatusHistory history = OrderStatusHistory.addHistory(this, newStatus);
+		this.orderStatusHistories.add(history);
+	}
+
+	public void addOrderItem(OrderItem orderItem) {
+		orderItems.add(orderItem);
+		orderItem.setOrder(this);
 	}
 
 	public int getTotalPrice() {
