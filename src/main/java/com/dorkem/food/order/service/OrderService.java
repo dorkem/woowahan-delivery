@@ -35,24 +35,27 @@ public class OrderService {
 	@Transactional
 	public String createOrder(Long userId, OrderCreateRequest request) {
 		User user = getUser(userId);
-		Store store = getStore(request);
+		Store store = getStore(request.storeId());
 		List<OrderItem> orderItems = getOrderItems(request.items());
 
-		DeliveryAddressRequest deliveryInfo = request.deliveryAddressRequest();
-		Order order = Order.createOrder(
-			store,
-			user,
-			orderItems,
-			deliveryInfo.address(),
-			deliveryInfo.addressDetail(),
+		CustomerInfo customerInfo = new CustomerInfo(user, user.getPhoneNumber());
+
+		OrderRequirement orderRequirement = new OrderRequirement(
 			request.requestToStore(),
-			deliveryInfo.requestToRider(),
-			deliveryInfo.entranceAccessPassword(),
-			deliveryInfo.deliveryDirections(),
 			request.noCutlery(),
 			request.noSideDish()
 		);
 
+		DeliveryAddressRequest deliveryReq = request.deliveryAddressRequest();
+		UserDeliveryInfo userDeliveryInfo = new UserDeliveryInfo(
+			deliveryReq.address(),
+			deliveryReq.addressDetail(),
+			deliveryReq.requestToRider(),
+			deliveryReq.entranceAccessPassword(),
+			deliveryReq.deliveryDirections()
+		);
+
+		Order order = Order.createOrder(store, customerInfo, orderRequirement, userDeliveryInfo, orderItems);
 		orderRepository.save(order);
 
 		return order.getOrderId();
@@ -72,9 +75,14 @@ public class OrderService {
 
 	@Transactional
 	public void cancelOrder(String orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));
+		Order order = getOrder(orderId);
 		order.cancelOrder();
+	}
+
+	// TODO: IllegalArgumentException로만 처리하는거 고민
+	private Order getOrder(String orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));
 	}
 
 	private User getUser(Long userId) {
@@ -82,8 +90,8 @@ public class OrderService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 	}
 
-	private Store getStore(OrderCreateRequest request) {
-		return storeRepository.findById(request.storeId())
+	private Store getStore(Long storeId) {
+		return storeRepository.findById(storeId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 가게를 찾을 수 없습니다."));
 	}
 

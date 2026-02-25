@@ -12,7 +12,6 @@ import com.dorkem.food.order.entity.embedded.CustomerInfo;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 import com.dorkem.food.store.entity.Store;
-import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,15 +28,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
+
 	@Id
+	@Getter
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "order_id")
 	private String orderId;
@@ -45,10 +47,6 @@ public class Order {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id")
 	private Store store;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
