@@ -4,12 +4,21 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.dorkem.food.order.entity.embedded.CustomerInfo;
+import com.dorkem.food.order.entity.embedded.OrderRequirement;
+import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -25,7 +34,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
-@Getter @Setter
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -47,26 +57,14 @@ public class Order {
 	@Column(name = "order_status", nullable = false)
 	private OrderStatus orderStatus;
 
-	@Column(name = "address", nullable = false)
-	private String address;
+	@Embedded
+	private CustomerInfo customerInfo;
 
-	@Column(name = "address_detail", nullable = false)
-	private String addressDetail;
+	@Embedded
+	private OrderRequirement orderRequirement;
 
-	@Column(name = "user_phone_number", nullable = false)
-	private String userPhoneNumber;
-
-	@Column(name = "request_to_store")
-	private String requestToStore;
-
-	@Column(name = "request_to_rider")
-	private String requestToRider;
-
-	@Column(name = "entrance_access_password")
-	String entranceAccessPassword;
-
-	@Column(name = "delivery_directions")
-	String deliveryDirections;
+	@Embedded
+	private UserDeliveryInfo userDeliveryInfo;
 
 	@Column(name = "no_cutlery", nullable = false)
 	private boolean noCutlery; // 수저 안 받기
@@ -82,37 +80,11 @@ public class Order {
 		orderItem.setOrder(this);
 	}
 
-	//TODO: 공통관심사끼리 embedded로 묶기
-	public static Order createOrder(
-		Store store,
-		User user,
-		List<OrderItem> orderItems,
-		String address,
-		String addressDetail,
-		String requestToStore,
-		String requestToRider,
-		String entranceAccessPassword,
-		String deliveryDirections,
-		boolean noCutlery,
-		boolean noSideDish
-	) {
-		Order order = new Order();
-		order.setStore(store);
-		order.setUser(user);
-		for (OrderItem orderItem : orderItems) {
-			order.addOrderItem(orderItem);
-		}
-		order.setOrderStatus(OrderStatus.CREATED);
-		order.setAddress(address);
-		order.setAddressDetail(addressDetail);
-		order.setUserPhoneNumber(user.getPhoneNumber());
-		order.setRequestToRider(requestToRider);
-		order.setRequestToStore(requestToStore);
-		order.setEntranceAccessPassword(entranceAccessPassword);
-		order.setDeliveryDirections(deliveryDirections);
-		order.setNoCutlery(noCutlery);
-		order.setNoSideDish(noSideDish);
-		order.setCreatedAt(LocalDateTime.now());
+	public static Order createOrder(Store store, CustomerInfo customerInfo, OrderRequirement orderRequirement,
+		UserDeliveryInfo userDeliveryInfo, List<OrderItem> orderItems) {
+		Order order = new Order(store, customerInfo, orderRequirement, userDeliveryInfo);
+		orderItems.forEach(order::addOrderItem);
+		order.changeStatus(OrderStatus.CREATED);
 		return order;
 	}
 
