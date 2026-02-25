@@ -91,16 +91,18 @@ public class Order {
 		return order;
 	}
 
+	// TODO: 검증로직 추가
 	public void acceptOrder() {
 		this.changeStatus(OrderStatus.PREPARING);
 	}
 
+	// TODO: 검증로직 추가
 	public void startDelivery() {
 		this.changeStatus(OrderStatus.DELIVERING);
 	}
 
+	// TODO: 검증로직 추가
 	public void cancelOrder() {
-		// 배달, 완료는 못함
 		this.changeStatus(OrderStatus.CANCELLED);
 	}
 

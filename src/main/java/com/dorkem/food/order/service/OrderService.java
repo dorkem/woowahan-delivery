@@ -79,7 +79,8 @@ public class OrderService {
 		order.cancelOrder();
 	}
 
-	// TODO: IllegalArgumentException로만 처리하는거 고민
+	// TODO: IllegalArgumentException로만 처리하면 상태코드로 400만 내뱉는다고 함
+	// 유저가 없을 때: 회원가입 페이지로 유도하는 등의 로직을 구현하기위해 구현고려
 	private Order getOrder(String orderId) {
 		return orderRepository.findById(orderId)
 			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));
