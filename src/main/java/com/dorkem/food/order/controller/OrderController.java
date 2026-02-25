@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,13 +33,27 @@ public class OrderController {
 			.body(Map.of("orderId", orderId));
 	}
 
-	@PostMapping("/{orderId}/cancel")
+	@PatchMapping("/{orderId}/accept")
+	public ResponseEntity<Void> acceptOrder(
+		@PathVariable String orderId
+	) {
+		orderService.acceptOrder(orderId);
+		return ResponseEntity.ok().build();
+	}
+
+	@PatchMapping("/{orderId}/delivery")
+	public ResponseEntity<Void> startDelivery(
+		@PathVariable String orderId
+	) {
+		orderService.startDelivery(orderId);
+		return ResponseEntity.ok().build();
+	}
+
+	@PatchMapping("/{orderId}/cancel")
 	public ResponseEntity<Void> cancelOrder(
 		@PathVariable String orderId
-	){
-		// 주문취소 요청은 누가 처리해야하는지
+	) {
 		orderService.cancelOrder(orderId);
-
 		return ResponseEntity.ok().build();
 	}
 }
