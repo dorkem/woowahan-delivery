@@ -33,6 +33,7 @@ public class OrderController {
 			.body(Map.of("orderId", orderId));
 	}
 
+	// TODO: 근데 얘네 한 번 처리하면 막는 로직도 필요함: 계속 쌓인다.-엔티티에서 처리
 	@PatchMapping("/{orderId}/accept")
 	public ResponseEntity<Void> acceptOrder(
 		@PathVariable String orderId
@@ -41,6 +42,7 @@ public class OrderController {
 		return ResponseEntity.ok().build();
 	}
 
+	// 딜리버리 도메인으로 빼는거 고려
 	@PatchMapping("/{orderId}/delivery")
 	public ResponseEntity<Void> startDelivery(
 		@PathVariable String orderId
