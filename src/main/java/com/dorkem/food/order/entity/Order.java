@@ -66,18 +66,20 @@ public class Order {
 	@Embedded
 	private UserDeliveryInfo userDeliveryInfo;
 
-	@Column(name = "no_cutlery", nullable = false)
-	private boolean noCutlery; // 수저 안 받기
-
-	@Column(name = "no_side_dish", nullable = false)
-	private boolean noSideDish; // 기본반찬 안 받기
-
+	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	public void addOrderItem(OrderItem orderItem) {
-		orderItems.add(orderItem);
-		orderItem.setOrder(this);
+	@LastModifiedDate
+	@Column(name = "modified_at", nullable = false)
+	private LocalDateTime modifiedAt;
+
+	private Order(Store store, CustomerInfo customerInfo, OrderRequirement orderRequirement,
+		UserDeliveryInfo userDeliveryInfo) {
+		this.store = store;
+		this.customerInfo = customerInfo;
+		this.orderRequirement = orderRequirement;
+		this.userDeliveryInfo = userDeliveryInfo;
 	}
 
 	public static Order createOrder(Store store, CustomerInfo customerInfo, OrderRequirement orderRequirement,
