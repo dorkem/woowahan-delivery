@@ -56,7 +56,7 @@ public class Order {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", nullable = false)
-	private OrderStatus orderStatus;
+	private OrderStatus currentStatus;
 
 	@Embedded
 	private CustomerInfo customerInfo;
@@ -87,29 +87,63 @@ public class Order {
 		UserDeliveryInfo userDeliveryInfo, List<OrderItem> orderItems) {
 		Order order = new Order(store, customerInfo, orderRequirement, userDeliveryInfo);
 		orderItems.forEach(order::addOrderItem);
-		order.changeStatus(OrderStatus.CREATED);
+		order.initStatus();
 		return order;
 	}
 
-	// TODO: 검증로직 추가
-	public void acceptOrder() {
-		this.changeStatus(OrderStatus.PREPARING);
+	public void requestPayment() {
+		this.nextStatus(OrderStatus.PAYMENT_REQUESTED);
 	}
 
-	// TODO: 검증로직 추가
+	public void completePayment() {
+		this.nextStatus(OrderStatus.PAYMENT_COMPLETED);
+	}
+
+	public void accept() {
+		this.nextStatus(OrderStatus.ACCEPTED);
+	}
+
+	public void reject() {
+		this.nextStatus(OrderStatus.REJECTED);
+	}
+
+	public void startCooking() {
+		this.nextStatus(OrderStatus.COOKING);
+	}
+
+	public void completeCooking() {
+		this.nextStatus(OrderStatus.COOK_COMPLETED);
+	}
+
+	public void requestDispatch() {
+		this.nextStatus(OrderStatus.DISPATCH_REQUESTED);
+	}
+
+	public void completeDispatch() {
+		this.nextStatus(OrderStatus.DISPATCH_COMPLETED);
+	}
+
 	public void startDelivery() {
-		this.changeStatus(OrderStatus.DELIVERING);
+		this.nextStatus(OrderStatus.DELIVERING);
 	}
 
-	// TODO: 검증로직 추가
-	public void cancelOrder() {
-		this.changeStatus(OrderStatus.CANCELLED);
+	public void completeDelivery() {
+		this.nextStatus(OrderStatus.DELIVERED);
 	}
 
-	private void changeStatus(OrderStatus newStatus) {
-		this.orderStatus = newStatus;
-		OrderStatusHistory history = OrderStatusHistory.addHistory(this, newStatus);
-		this.orderStatusHistories.add(history);
+	public void cancel() {
+		this.nextStatus(OrderStatus.CANCELLED);
+	}
+
+	private void initStatus() {
+		this.currentStatus = OrderStatus.CREATED;
+		this.orderStatusHistories.add(OrderStatusHistory.addHistory(this, OrderStatus.CREATED));
+	}
+
+	private void nextStatus(OrderStatus status) {
+		OrderStatus.validateTransition(this.currentStatus, status);
+		this.currentStatus = status;
+		this.orderStatusHistories.add(OrderStatusHistory.addHistory(this, status));
 	}
 
 	public void addOrderItem(OrderItem orderItem) {

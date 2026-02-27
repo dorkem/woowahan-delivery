@@ -62,9 +62,52 @@ public class OrderService {
 	}
 
 	@Transactional
+	public void requestPayment(String orderId) {
+		Order order = getOrder(orderId);
+		order.requestPayment();
+	}
+
+	@Transactional
+	public void completePayment(String orderId) {
+		Order order = getOrder(orderId);
+		order.completePayment();
+	}
+
+	@Transactional
 	public void acceptOrder(String orderId) {
 		Order order = getOrder(orderId);
-		order.acceptOrder();
+		order.accept();
+	}
+
+	@Transactional
+	public void rejectOrder(String orderId) {
+		Order order = getOrder(orderId);
+		order.reject();
+	}
+
+	@Transactional
+	public void startCooking(String orderId) {
+		Order order = getOrder(orderId);
+		order.startCooking();
+	}
+
+	@Transactional
+	public void completeCooking(String orderId) {
+		Order order = getOrder(orderId);
+		order.completeCooking();
+	}
+
+	// 배달 도메인
+	@Transactional
+	public void requestDispatch(String orderId) {
+		Order order = getOrder(orderId);
+		order.requestDispatch();
+	}
+
+	@Transactional
+	public void completeDispatch(String orderId) {
+		Order order = getOrder(orderId);
+		order.completeDispatch();
 	}
 
 	@Transactional
@@ -74,9 +117,15 @@ public class OrderService {
 	}
 
 	@Transactional
+	public void completeDelivery(String orderId) {
+		Order order = getOrder(orderId);
+		order.completeDelivery();
+	}
+
+	@Transactional
 	public void cancelOrder(String orderId) {
 		Order order = getOrder(orderId);
-		order.cancelOrder();
+		order.cancel();
 	}
 
 	// TODO: IllegalArgumentException로만 처리하면 상태코드로 400만 내뱉는다고 함

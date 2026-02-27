@@ -1,10 +1,35 @@
 package com.dorkem.food.order.entity;
 
 public enum OrderStatus {
-	CREATED,
-	PENDING,
-	PREPARING,
-	DELIVERING,
-	COMPLETED,
-	CANCELLED,
+	CREATED(null),
+	PAYMENT_REQUESTED(CREATED),
+	PAYMENT_COMPLETED(PAYMENT_REQUESTED),
+	ACCEPTED(PAYMENT_COMPLETED),
+	REJECTED(PAYMENT_COMPLETED),
+	COOKING(ACCEPTED),
+	COOK_COMPLETED(COOKING),
+	DISPATCH_REQUESTED(COOK_COMPLETED),
+	DISPATCH_COMPLETED(DISPATCH_REQUESTED),
+	DELIVERING(DISPATCH_COMPLETED),
+	DELIVERED(DELIVERING),
+	CANCELLED(null);
+
+	private final OrderStatus previousStatus;
+
+	OrderStatus(OrderStatus previousStatus) {
+		this.previousStatus = previousStatus;
+	}
+
+	public static void validateTransition(OrderStatus current, OrderStatus next) {
+		if (next == CANCELLED) {
+			if (current == DELIVERED || current == REJECTED || current == CANCELLED) {
+				throw new IllegalStateException("%s 상태인 주문에는 취소할 수 없습니다.".formatted(current));
+			}
+			return;
+		}
+
+		if (next.previousStatus != current) {
+			throw new IllegalStateException("Cannot transition from %s to %s".formatted(current, next));
+		}
+	}
 }
