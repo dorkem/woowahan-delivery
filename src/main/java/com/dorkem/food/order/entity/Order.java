@@ -156,4 +156,16 @@ public class Order {
 			.mapToInt(OrderItem::getTotalPrice)
 			.sum();
 	}
+
+	public OrderStatus currentStatus() {
+		return this.currentStatus;
+	}
+
+	public List<OrderStatusHistory> orderStatusHistories() {
+		return this.orderStatusHistories;
+	}
+
+	public List<OrderItem> getOrderItems() {
+		return this.orderItems;
+	}
 }

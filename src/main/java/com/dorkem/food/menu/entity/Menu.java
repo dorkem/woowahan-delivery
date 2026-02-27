@@ -2,23 +2,32 @@ package com.dorkem.food.menu.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.dorkem.food.store.entity.Store;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "menus")
-@Getter @Setter
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
+
 	@Id
+	@Getter
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "menu_id")
 	private Long menuId;
@@ -35,6 +44,7 @@ public class Menu {
 	@Column(name = "price", nullable = false)
 	private int price;
 
+	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 }

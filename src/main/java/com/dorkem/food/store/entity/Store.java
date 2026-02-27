@@ -5,11 +5,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -20,16 +24,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "stores")
-@Getter @Setter
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store {
 	//TODO: 공통관심사끼리 embedded로 묶기
 
 	@Id
+	@Getter
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "store_id")
 	private Long storeId;
@@ -75,6 +82,7 @@ public class Store {
 	@Column(name = "base_delivery_fee", nullable = false)
 	private int baseDeliveryFee;
 
+	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 }
