@@ -42,15 +42,6 @@ public class OrderController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 딜리버리 도메인으로 빼는거 고려
-	@PatchMapping("/{orderId}/delivery")
-	public ResponseEntity<Void> startDelivery(
-		@PathVariable String orderId
-	) {
-		orderService.startDelivery(orderId);
-		return ResponseEntity.ok().build();
-	}
-
 	@PatchMapping("/{orderId}/cancel")
 	public ResponseEntity<Void> cancelOrder(
 		@PathVariable String orderId
