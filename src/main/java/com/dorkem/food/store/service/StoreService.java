@@ -43,7 +43,7 @@ public class StoreService {
 	}
 
 	private Order getOrderByStore(String orderId, Long storeId) {
-		return orderRepository.findByOrderIdAndStoreId(orderId, storeId)
+		return orderRepository.findByOrderIdAndStoreStoreId(orderId, storeId)
 			.orElseThrow(() -> new IllegalArgumentException("가게의 주문을 찾을 수 없습니다."));
 	}
 }
