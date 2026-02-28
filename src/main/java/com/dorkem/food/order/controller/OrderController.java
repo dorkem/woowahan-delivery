@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
+import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 	private final OrderService orderService;
 
-	@PostMapping
+	@PostMapping("/order-create")
 	public ResponseEntity<Map<String, String>> createOrder(
 		@RequestBody OrderCreateRequest request
 	) {
