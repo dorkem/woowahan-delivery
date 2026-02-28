@@ -35,16 +35,31 @@ public class Menu {
 	@ManyToOne
 	private Store store;
 
+	@Getter
 	@Column(name = "menu_name", nullable = false)
 	private String menuName;
 
 	@Column(name = "menu_description")
 	private String menuDescription;
 
+	@Getter
 	@Column(name = "price", nullable = false)
 	private int price;
 
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
+
+	private Menu(Store store, String menuName, String menuDescription, int price
+	) {
+		this.store = store;
+		this.menuName = menuName;
+		this.menuDescription = menuDescription;
+		this.price = price;
+	}
+
+	public static Menu createMenu(Store store, String menuName, String menuDescription, int price
+	) {
+		return new Menu(store, menuName, menuDescription, price);
+	}
 }

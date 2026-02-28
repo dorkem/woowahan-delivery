@@ -85,4 +85,34 @@ public class Store {
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
+
+	private Store(User owner, String storeName, String businessNumber, String storeAddress,
+		String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
+		StoreStatus status, LocalTime openTime, LocalTime closeTime,
+		int minOrderAmount, int baseDeliveryFee
+	) {
+		this.owner = owner;
+		this.storeName = storeName;
+		this.businessNumber = businessNumber;
+		this.storeAddress = storeAddress;
+		this.storeAddressDetails = storeAddressDetails;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.status = status;
+		this.openTime = openTime;
+		this.closeTime = closeTime;
+		this.minOrderAmount = minOrderAmount;
+		this.baseDeliveryFee = baseDeliveryFee;
+	}
+
+	public static Store createStore(User owner, String storeName, String businessNumber, String storeAddress,
+		String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
+		StoreStatus status, LocalTime openTime, LocalTime closeTime,
+		int minOrderAmount, int baseDeliveryFee
+	) {
+		return new Store(
+			owner, storeName, businessNumber, storeAddress, storeAddressDetails,
+			latitude, longitude, status, openTime, closeTime, minOrderAmount, baseDeliveryFee
+		);
+	}
 }

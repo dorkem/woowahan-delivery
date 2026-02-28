@@ -47,10 +47,26 @@ public class User {
 	@Column(name = "password", nullable = false)
 	private String password;
 
+	@Getter
 	@Column(name = "phone_number", nullable = false, unique = true)
 	private String phoneNumber;
 
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
+
+	private User(LoginType loginType, UserType userType, String email,
+		String username, String password, String phoneNumber) {
+		this.loginType = loginType;
+		this.userType = userType;
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.phoneNumber = phoneNumber;
+	}
+
+	public static User createUser(LoginType loginType, UserType userType, String email,
+		String username, String password, String phoneNumber) {
+		return new User(loginType, userType, email, username, password, phoneNumber);
+	}
 }
