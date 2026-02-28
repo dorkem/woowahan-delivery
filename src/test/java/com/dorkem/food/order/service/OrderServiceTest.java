@@ -82,7 +82,7 @@ class OrderServiceTest {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new AssertionError("주문이 생성되지 않았습니다."));
 
-		assertThat(order.currentStatus()).isEqualTo(OrderStatus.CREATED);
+		assertThat(order.getCurrentStatus()).isEqualTo(OrderStatus.CREATED);
 		assertThat(order.getOrderItems()).hasSize(2);
 		assertThat(order.getTotalPrice()).isEqualTo(20000 + 5000 * 2);
 	}

@@ -32,14 +32,14 @@ class OrderTest {
 	@Test
 	@DisplayName("주문 생성 시 현재 상태는 CREATED 이다")
 	void 주문생성시_상태는_CREATED() {
-		assertThat(order.currentStatus()).isEqualTo(OrderStatus.CREATED);
+		assertThat(order.getCurrentStatus()).isEqualTo(OrderStatus.CREATED);
 	}
 
 	@Test
 	@DisplayName("주문 생성 시 히스토리에 CREATED가 쌓인다")
 	void 주문시_히스토리에_CREATED_쌓임() {
-		assertThat(order.orderStatusHistories()).hasSize(1);
-		assertThat(order.orderStatusHistories().get(0).getStatus()).isEqualTo(OrderStatus.CREATED);
+		assertThat(order.getOrderStatusHistories()).hasSize(1);
+		assertThat(order.getOrderStatusHistories().get(0).getStatus()).isEqualTo(OrderStatus.CREATED);
 	}
 
 	@Test
