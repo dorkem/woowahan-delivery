@@ -51,7 +51,11 @@ public class OrderStatusHistory {
 		return new OrderStatusHistory(order, status);
 	}
 
-	public OrderStatus getStatus(){
+	public OrderStatus getStatus() {
 		return status;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
 	}
 }

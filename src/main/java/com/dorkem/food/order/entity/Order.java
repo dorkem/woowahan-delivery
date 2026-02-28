@@ -67,6 +67,9 @@ public class Order {
 	@Embedded
 	private UserDeliveryInfo userDeliveryInfo;
 
+	@Column(name = "is_active")
+	private boolean isActive = true;
+
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
@@ -151,21 +154,37 @@ public class Order {
 		orderItem.setOrder(this);
 	}
 
+	public String getStoreName() {
+		return store.getStoreName();
+	}
+
+	public UserDeliveryInfo getUserDeliveryInfo() {
+		return userDeliveryInfo;
+	}
+
+	public OrderRequirement getOrderRequirement() {
+		return orderRequirement;
+	}
+
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+
+	public List<OrderStatusHistory> getOrderStatusHistories() {
+		return orderStatusHistories;
+	}
+
+	public OrderStatus getCurrentStatus() {
+		return currentStatus;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
 	public int getTotalPrice() {
 		return orderItems.stream()
 			.mapToInt(OrderItem::getTotalPrice)
 			.sum();
-	}
-
-	public OrderStatus currentStatus() {
-		return this.currentStatus;
-	}
-
-	public List<OrderStatusHistory> orderStatusHistories() {
-		return this.orderStatusHistories;
-	}
-
-	public List<OrderItem> getOrderItems() {
-		return this.orderItems;
 	}
 }

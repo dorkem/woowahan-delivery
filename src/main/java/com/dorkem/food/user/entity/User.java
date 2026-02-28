@@ -69,4 +69,8 @@ public class User {
 		String username, String password, String phoneNumber) {
 		return new User(loginType, userType, email, username, password, phoneNumber);
 	}
+
+	public String getUsername() {
+		return username;
+	}
 }

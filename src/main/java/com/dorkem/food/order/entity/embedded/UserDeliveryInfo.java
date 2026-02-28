@@ -32,4 +32,16 @@ public class UserDeliveryInfo {
 		this.entranceAccessPassword = entranceAccessPassword;
 		this.deliveryDirections = deliveryDirections;
 	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public String getAddressDetail() {
+		return addressDetail;
+	}
+
+	public String getRequestToRider() {
+		return requestToRider;
+	}
 }

@@ -23,4 +23,16 @@ public class OrderRequirement {
 		this.noCutlery = noCutlery;
 		this.noSideDish = noSideDish;
 	}
+
+	public String getRequestToStore() {
+		return requestToStore;
+	}
+
+	public boolean isNoCutlery() {
+		return noCutlery;
+	}
+
+	public boolean isNoSideDish() {
+		return noSideDish;
+	}
 }

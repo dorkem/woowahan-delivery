@@ -46,6 +46,7 @@ public class OrderItem {
 	@Column(name = "order_price", nullable = false)
 	private int orderPrice;
 
+	@Getter
 	@Column(name = "quantity", nullable = false)
 	private int quantity;
 

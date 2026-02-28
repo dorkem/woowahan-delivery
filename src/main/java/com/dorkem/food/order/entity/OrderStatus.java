@@ -4,7 +4,7 @@ public enum OrderStatus {
 	CREATED(null),
 	PAYMENT_REQUESTED(CREATED),
 	PAYMENT_COMPLETED(PAYMENT_REQUESTED),
-	ACCEPTED(PAYMENT_COMPLETED),
+	ACCEPTED(CREATED),//임시
 	REJECTED(PAYMENT_COMPLETED),
 	COOKING(ACCEPTED),
 	COOK_COMPLETED(COOKING),
@@ -18,6 +18,17 @@ public enum OrderStatus {
 
 	OrderStatus(OrderStatus previousStatus) {
 		this.previousStatus = previousStatus;
+	}
+
+	public DisplayStatus displayOrderStatus() {
+		return switch (this) {
+			case CREATED, PAYMENT_REQUESTED, PAYMENT_COMPLETED -> DisplayStatus.PENDING;
+			case ACCEPTED -> DisplayStatus.CONFIRMED;
+			case COOKING, COOK_COMPLETED -> DisplayStatus.COOKING;
+			case DISPATCH_REQUESTED, DISPATCH_COMPLETED, DELIVERING -> DisplayStatus.DELIVERING;
+			case DELIVERED -> DisplayStatus.DELIVERED;
+			case REJECTED, CANCELLED -> DisplayStatus.CANCELLED;
+		};
 	}
 
 	public static void validateTransition(OrderStatus current, OrderStatus next) {

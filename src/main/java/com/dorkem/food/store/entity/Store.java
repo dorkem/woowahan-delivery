@@ -48,6 +48,7 @@ public class Store {
 	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
 
+	@Getter
 	@Column(name = "store_name", nullable = false)
 	private String storeName;
 
