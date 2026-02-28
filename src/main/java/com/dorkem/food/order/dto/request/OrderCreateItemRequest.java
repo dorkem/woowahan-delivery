@@ -1,4 +1,4 @@
-package com.dorkem.food.order.dto;
+package com.dorkem.food.order.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

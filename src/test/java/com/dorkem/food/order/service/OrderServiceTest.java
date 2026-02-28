@@ -13,9 +13,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dorkem.food.menu.entity.Menu;
-import com.dorkem.food.order.dto.DeliveryAddressRequest;
-import com.dorkem.food.order.dto.OrderCreateRequest;
-import com.dorkem.food.order.dto.OrderCreateItemRequest;
+import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
+import com.dorkem.food.order.dto.request.OrderCreateRequest;
+import com.dorkem.food.order.dto.request.OrderCreateItemRequest;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderStatus;
 import com.dorkem.food.order.repository.OrderRepository;

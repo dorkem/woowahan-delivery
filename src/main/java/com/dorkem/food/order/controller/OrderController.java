@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dorkem.food.order.dto.OrderCreateRequest;
+import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
