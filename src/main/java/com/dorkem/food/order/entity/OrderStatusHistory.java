@@ -50,4 +50,8 @@ public class OrderStatusHistory {
 	public static OrderStatusHistory addHistory(Order order, OrderStatus status) {
 		return new OrderStatusHistory(order, status);
 	}
+
+	public OrderStatus getStatus(){
+		return status;
+	}
 }
