@@ -33,6 +33,14 @@ public class OrderController {
 			.body(Map.of("orderId", orderId));
 	}
 
+	@GetMapping("users/{userId}/current")
+	public ResponseEntity<OrderResponse> getCurrentUserOrders(
+		@PathVariable Long userId
+	) {
+		return ResponseEntity
+			.ok(orderService.getCurrentUserOrders(userId));
+	}
+
 	// TODO: 근데 얘네 한 번 처리하면 막는 로직도 필요함: 계속 쌓인다.-엔티티에서 처리
 	@PatchMapping("/{orderId}/accept")
 	public ResponseEntity<Void> acceptOrder(

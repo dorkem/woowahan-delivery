@@ -11,11 +11,13 @@ import com.dorkem.food.menu.repository.MenuRepository;
 import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.dto.request.OrderCreateItemRequest;
+import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderItem;
 import com.dorkem.food.order.entity.embedded.CustomerInfo;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
+import com.dorkem.food.order.repository.OrderQueryRepository;
 import com.dorkem.food.order.repository.OrderRepository;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.repository.StoreRepository;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderService {
 	private final OrderRepository orderRepository;
+	private final OrderQueryRepository orderQueryRepository;
 	private final StoreRepository storeRepository;
 	private final UserRepository userRepository;
 	private final MenuRepository menuRepository;
@@ -59,6 +62,14 @@ public class OrderService {
 		orderRepository.save(order);
 
 		return order.getOrderId();
+	}
+
+	@Transactional(readOnly = true)
+	public OrderResponse getCurrentUserOrders(Long userId) {
+		Order order = orderQueryRepository.findByUserCurrentOrder(userId)
+			.orElseThrow(() -> new IllegalArgumentException("현재 진행 중인 주문이 없습니다."));
+
+		return OrderResponse.createOrderResponse(order);
 	}
 
 	@Transactional
