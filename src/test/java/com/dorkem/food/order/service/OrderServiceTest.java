@@ -1,6 +1,6 @@
 package com.dorkem.food.order.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +49,10 @@ class OrderServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		customer = createUser("최재혁", "password", "jaehyeok@ar.co.kr", "123-4567-8910", LoginType.KAKAO,
-			UserType.CUSTOMER);
-		owner = createUser("NEO", "password", "neo@ar.co.kr", "109-8765-4321", LoginType.KAKAO, UserType.OWNER);
+		customer = createUser("최재혁", "password", "jaehyeok@ar.co.kr", "123-4567-8910",
+			LoginType.KAKAO, UserType.CUSTOMER);
+		owner = createUser("NEO", "password", "neo@ar.co.kr", "109-8765-4321",
+			LoginType.KAKAO, UserType.OWNER);
 		store = createStore(owner);
 		bbulingCle = createMenu(store, "뿌링클", "맛있음", 20000);
 		cheeseBall = createMenu(store, "치즈볼", "진짜맛있음", 5000);
@@ -81,46 +82,79 @@ class OrderServiceTest {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new AssertionError("주문이 생성되지 않았습니다."));
 
-		assertEquals(OrderStatus.CREATED, order.getOrderStatus());
-		assertEquals(2, order.getOrderItems().size());
-		assertEquals(20000 + 5000 * 2, order.getTotalPrice());
+		assertThat(order.currentStatus()).isEqualTo(OrderStatus.CREATED);
+		assertThat(order.getOrderItems()).hasSize(2);
+		assertThat(order.getTotalPrice()).isEqualTo(20000 + 5000 * 2);
 	}
 
-	private User createUser(String userName, String password, String email, String phoneNumber, LoginType loginType,
-		UserType userType) {
-		User user = new User();
-		user.setUsername(userName);
-		user.setPassword(password);
-		user.setEmail(email);
-		user.setPhoneNumber(phoneNumber);
-		user.setLoginType(loginType);
-		user.setUserType(userType);
+	@Test
+	void 없는_주문_취소시_예외발생() {
+		assertThatThrownBy(() -> orderService.cancelOrder("없는ID"))
+			.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void 잘못된_상태에서_취소불가() {
+		String orderId = createTestOrder();
+		orderService.requestPayment(orderId);
+		orderService.completePayment(orderId);
+		assertThatNoException().isThrownBy(() -> orderService.cancelOrder(orderId));
+	}
+
+	private String createTestOrder() {
+		DeliveryAddressRequest deliveryInfo = new DeliveryAddressRequest(
+			"서울시 금천구", "123호", "-", "-", "-"
+		);
+		OrderCreateRequest request = new OrderCreateRequest(
+			store.getStoreId(),
+			List.of(new OrderCreateItemRequest(bbulingCle.getMenuId(), 1)),
+			deliveryInfo,
+			"-",
+			false,
+			false
+		);
+		return orderService.createOrder(customer.getUserId(), request);
+	}
+
+	private User createUser(String userName, String password, String email,
+		String phoneNumber, LoginType loginType, UserType userType) {
+		User user = User.createUser(
+			loginType,
+			userType,
+			email,
+			userName,
+			password,
+			phoneNumber
+		);
 		em.persist(user);
 		return user;
 	}
 
 	private Store createStore(User owner) {
-		Store store = new Store();
-		store.setOwner(owner);
-		store.setStoreName("BBQ");
-		store.setBusinessNumber("123-45-67890");
-		store.setStoreAddress("서울특별시 강남구");
-		store.setStoreAddressDetails("15층");
-		store.setStatus(StoreStatus.OPEN);
-		store.setMinOrderAmount(15000);
-		store.setBaseDeliveryFee(3000);
+		Store store = Store.createStore(
+			owner,
+			"BBQ",
+			"123-45-67890",
+			"서울특별시 강남구",
+			"15층",
+			null, null,
+			StoreStatus.OPEN,
+			null, null,
+			15000,
+			3000
+		);
 		em.persist(store);
 		return store;
 	}
 
 	private Menu createMenu(Store store, String menuName, String menuDescription, int price) {
-		Menu menu = new Menu();
-		menu.setStore(store);
-		menu.setMenuName(menuName);
-		menu.setMenuDescription(menuDescription);
-		menu.setPrice(price);
+		Menu menu = Menu.createMenu(
+			store,
+			menuName,
+			menuDescription,
+			price
+		);
 		em.persist(menu);
 		return menu;
 	}
-
 }
