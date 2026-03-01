@@ -25,4 +25,8 @@ public class CustomerInfo {
 		this.user = user;
 		this.userPhoneNumber = userPhoneNumber;
 	}
+
+	public String getUserPhoneNumber() {
+		return userPhoneNumber;
+	}
 }
