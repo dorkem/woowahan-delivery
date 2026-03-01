@@ -1,5 +1,8 @@
 package com.dorkem.food.order.service;
 
+import static com.dorkem.food.order.dto.response.OrderResponse.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +14,7 @@ import com.dorkem.food.menu.repository.MenuRepository;
 import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.dto.request.OrderCreateItemRequest;
+import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
 import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderItem;
@@ -69,7 +73,64 @@ public class OrderService {
 		Order order = orderQueryRepository.findByUserCurrentOrder(userId)
 			.orElseThrow(() -> new IllegalArgumentException("현재 진행 중인 주문이 없습니다."));
 
-		return OrderResponse.createOrderResponse(order);
+		return createOrderResponse(order);
+	}
+
+	@Transactional(readOnly = true)
+	public HistoryDetailResponse getOrderDetail(Long userId, String orderId) {
+		Order order = orderQueryRepository.findOrderDetail(userId, orderId)
+			.orElseThrow(() -> new IllegalArgumentException("주문내역을 찾을 수 없습니다."));
+
+		return HistoryDetailResponse.createHistoryDetailResponse(order);
+	}
+
+	@Transactional(readOnly = true)
+	public OrderHistoryPageResponse getOrderHistory(Long userId, String cursor, int size) {
+		LocalDateTime cursorTime = null;
+		if (cursor == null || cursor.isBlank()) {
+			cursorTime = LocalDateTime.now();
+		} else if (cursor != null && !cursor.isBlank()) {
+			cursorTime = LocalDateTime.parse(cursor);
+		}
+
+		// 6개 가져오고 이후에 데이터가 있는지 확인
+		List<Order> orders = orderQueryRepository.findOrderHistory(userId, cursorTime, size + 1);
+		boolean hasNext = orders.size() > size;
+
+		List<Order> content = null;
+		if (hasNext) {
+			content = orders.subList(0, size);
+		} else if (!hasNext) {
+			content = orders;
+		}
+
+		// 다음 위치 파악하는 것
+		String nextCursor = null;
+		if (hasNext) {
+			nextCursor = content.get(content.size() - 1).getCreatedAt().toString();
+		} else if (!hasNext) {
+			nextCursor = null;
+		}
+
+		List<HistoryResponse> responseList = new ArrayList<>();
+		for (Order order : content) {
+			HistoryResponse response = HistoryResponse.createHistoryResponse(order);
+			responseList.add(response);
+		}
+
+		return new OrderHistoryPageResponse(
+			responseList,
+			nextCursor,
+			hasNext
+		);
+	}
+
+	@Transactional
+	public void deleteOrderHistory(Long userId, String orderId) {
+		Order order = orderQueryRepository.findOrderDetail(userId, orderId)
+			.orElseThrow(() -> new IllegalArgumentException("주문 내역을 찾을 수 없습니다."));
+
+		order.deactivate();
 	}
 
 	@Transactional
