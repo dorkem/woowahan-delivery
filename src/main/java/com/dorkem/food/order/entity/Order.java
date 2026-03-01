@@ -70,6 +70,9 @@ public class Order {
 	@Column(name = "is_active")
 	private boolean isActive = true;
 
+	@Column(name = "is_deleted")
+	private boolean isDeleted = false;
+
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
@@ -108,6 +111,7 @@ public class Order {
 
 	public void reject() {
 		this.nextStatus(OrderStatus.REJECTED);
+		this.isActive = false;
 	}
 
 	public void startCooking() {
@@ -132,10 +136,12 @@ public class Order {
 
 	public void completeDelivery() {
 		this.nextStatus(OrderStatus.DELIVERED);
+		this.isActive = false;
 	}
 
 	public void cancel() {
 		this.nextStatus(OrderStatus.CANCELLED);
+		this.isActive = false;
 	}
 
 	private void initStatus() {
@@ -154,8 +160,16 @@ public class Order {
 		orderItem.setOrder(this);
 	}
 
+	public void deactivate() {
+		this.isDeleted = true;
+	}
+
 	public String getStoreName() {
 		return store.getStoreName();
+	}
+
+	public CustomerInfo getCustomerInfo() {
+		return customerInfo;
 	}
 
 	public UserDeliveryInfo getUserDeliveryInfo() {
