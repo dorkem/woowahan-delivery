@@ -98,49 +98,49 @@ public class Order {
 	}
 
 	public void requestPayment() {
-		this.nextStatus(OrderStatus.PAYMENT_REQUESTED);
+		this.changeStatus(OrderStatus.PAYMENT_REQUESTED);
 	}
 
 	public void completePayment() {
-		this.nextStatus(OrderStatus.PAYMENT_COMPLETED);
+		this.changeStatus(OrderStatus.PAYMENT_COMPLETED);
 	}
 
 	public void accept() {
-		this.nextStatus(OrderStatus.ACCEPTED);
+		this.changeStatus(OrderStatus.ACCEPTED);
 	}
 
 	public void reject() {
-		this.nextStatus(OrderStatus.REJECTED);
+		this.changeStatus(OrderStatus.REJECTED);
 		this.isActive = false;
 	}
 
 	public void startCooking() {
-		this.nextStatus(OrderStatus.COOKING);
+		this.changeStatus(OrderStatus.COOKING);
 	}
 
 	public void completeCooking() {
-		this.nextStatus(OrderStatus.COOK_COMPLETED);
+		this.changeStatus(OrderStatus.COOK_COMPLETED);
 	}
 
 	public void requestDispatch() {
-		this.nextStatus(OrderStatus.DISPATCH_REQUESTED);
+		this.changeStatus(OrderStatus.DISPATCH_REQUESTED);
 	}
 
 	public void completeDispatch() {
-		this.nextStatus(OrderStatus.DISPATCH_COMPLETED);
+		this.changeStatus(OrderStatus.DISPATCH_COMPLETED);
 	}
 
 	public void startDelivery() {
-		this.nextStatus(OrderStatus.DELIVERING);
+		this.changeStatus(OrderStatus.DELIVERING);
 	}
 
 	public void completeDelivery() {
-		this.nextStatus(OrderStatus.DELIVERED);
+		this.changeStatus(OrderStatus.DELIVERED);
 		this.isActive = false;
 	}
 
 	public void cancel() {
-		this.nextStatus(OrderStatus.CANCELLED);
+		this.changeStatus(OrderStatus.CANCELLED);
 		this.isActive = false;
 	}
 
@@ -149,8 +149,8 @@ public class Order {
 		this.orderStatusHistories.add(OrderStatusHistory.addHistory(this, OrderStatus.CREATED));
 	}
 
-	private void nextStatus(OrderStatus status) {
-		OrderStatus.validateTransition(this.currentStatus, status);
+	private void changeStatus(OrderStatus status) {
+		this.currentStatus.validateTransition(status);
 		this.currentStatus = status;
 		this.orderStatusHistories.add(OrderStatusHistory.addHistory(this, status));
 	}

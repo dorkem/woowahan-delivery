@@ -31,16 +31,15 @@ public enum OrderStatus {
 		};
 	}
 
-	public static void validateTransition(OrderStatus current, OrderStatus next) {
+	public void validateTransition(OrderStatus next) {
 		if (next == CANCELLED) {
-			if (current == DELIVERED || current == REJECTED || current == CANCELLED) {
-				throw new IllegalStateException("%s 상태인 주문에는 취소할 수 없습니다.".formatted(current));
+			if (this == DELIVERED || this == REJECTED || this == CANCELLED) {
+				throw new IllegalStateException("%s 상태인 주문에는 취소할 수 없습니다.".formatted(this));
 			}
 			return;
 		}
-
-		if (next.previousStatus != current) {
-			throw new IllegalStateException("Cannot transition from %s to %s".formatted(current, next));
+		if (next.previousStatus != this) {
+			throw new IllegalStateException("Cannot transition from %s to %s".formatted(this, next));
 		}
 	}
 }
