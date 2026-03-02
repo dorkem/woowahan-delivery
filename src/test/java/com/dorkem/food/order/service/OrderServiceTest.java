@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,8 @@ import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.dto.request.OrderCreateItemRequest;
+import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
+import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderStatus;
 import com.dorkem.food.order.repository.OrderRepository;
@@ -88,6 +91,72 @@ class OrderServiceTest {
 	}
 
 	@Test
+	void 없는_유저로_주문시_예외발생() {
+		OrderCreateRequest request = new OrderCreateRequest(
+			store.getStoreId(),
+			List.of(new OrderCreateItemRequest(bbulingCle.getMenuId(), 1)),
+			new DeliveryAddressRequest("-", "-", "-", "-", "-"),
+			"-", false, false
+		);
+
+		assertThatThrownBy(() -> orderService.createOrder(-1L, request))
+			.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void 없는_메뉴로_주문시_예외발생() {
+		OrderCreateRequest request = new OrderCreateRequest(
+			store.getStoreId(),
+			List.of(new OrderCreateItemRequest(-1L, 1)),
+			new DeliveryAddressRequest("-", "-", "-", "-", "-"),
+			"-", false, false
+		);
+
+		assertThatThrownBy(() -> orderService.createOrder(customer.getUserId(), request))
+			.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("정상적인 상태 흐름")
+	void 상태흐름이_정상일때() {
+		String orderId = createTestOrder();
+		// orderService.requestPayment(orderId);
+		// assertOrderStatus(orderId, OrderStatus.PAYMENT_REQUESTED);
+		// orderService.completePayment(orderId);
+		// assertOrderStatus(orderId, OrderStatus.PAYMENT_COMPLETED);
+		orderService.acceptOrder(orderId);
+		assertOrderStatus(orderId, OrderStatus.ACCEPTED);
+
+		orderService.startCooking(orderId);
+		assertOrderStatus(orderId, OrderStatus.COOKING);
+
+		orderService.completeCooking(orderId);
+		assertOrderStatus(orderId, OrderStatus.COOK_COMPLETED);
+
+		orderService.requestDispatch(orderId);
+		assertOrderStatus(orderId, OrderStatus.DISPATCH_REQUESTED);
+
+		orderService.completeDispatch(orderId);
+		assertOrderStatus(orderId, OrderStatus.DISPATCH_COMPLETED);
+
+		orderService.startDelivery(orderId);
+		assertOrderStatus(orderId, OrderStatus.DELIVERING);
+
+		orderService.completeDelivery(orderId);
+		assertOrderStatus(orderId, OrderStatus.DELIVERED);
+	}
+
+	@Test
+	void 가게가_주문_거절() {
+		String orderId = createTestOrder();
+		orderService.requestPayment(orderId);
+		orderService.completePayment(orderId);
+		orderService.rejectOrder(orderId);
+
+		assertOrderStatus(orderId, OrderStatus.REJECTED);
+	}
+
+	@Test
 	void 없는_주문_취소시_예외발생() {
 		assertThatThrownBy(() -> orderService.cancelOrder("없는ID"))
 			.isInstanceOf(IllegalArgumentException.class);
@@ -99,6 +168,71 @@ class OrderServiceTest {
 		orderService.requestPayment(orderId);
 		orderService.completePayment(orderId);
 		assertThatNoException().isThrownBy(() -> orderService.cancelOrder(orderId));
+	}
+
+	@Test
+	void 현재_진행중인_주문_조회_성공() {
+		String orderId = createTestOrder();
+		OrderResponse response = orderService.getCurrentUserOrders(customer.getUserId());
+		assertThat(response).isNotNull();
+		assertThat(response.orderId()).isEqualTo(orderId);
+	}
+
+	@Test
+	void 진행중인_주문이_없으면_예외발생() {
+		assertThatThrownBy(() -> orderService.getCurrentUserOrders(customer.getUserId()))
+			.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void 주문_히스토리_조회_성공() {
+		String orderId1 = createTestOrder();
+		entireProcess(orderId1);
+
+		String orderId2 = createTestOrder();
+		entireProcess(orderId2);
+
+		OrderHistoryPageResponse response = orderService.getOrderHistory(customer.getUserId(), null, 10);
+		assertThat(response.orders()).hasSize(2);
+		assertThat(response.hasNext()).isFalse();
+	}
+
+	@Test
+	void 주문_히스토리_무한스크롤_테스트() {
+		for (int i = 0; i < 3; i++) {
+			String oid = createTestOrder();
+			entireProcess(oid);
+		}
+
+		OrderHistoryPageResponse firstPage = orderService.getOrderHistory(
+			customer.getUserId(), null, 2
+		);
+		assertThat(firstPage.orders()).hasSize(2);
+		assertThat(firstPage.hasNext()).isTrue();
+
+		OrderHistoryPageResponse secondPage = orderService.getOrderHistory(
+			customer.getUserId(), firstPage.nextCursor(), 2
+		);
+		assertThat(secondPage.orders()).hasSize(1);
+		assertThat(secondPage.hasNext()).isFalse();
+	}
+
+	@Test
+	void 주문_내역_삭제_성공() {
+		String orderId = createTestOrder();
+		entireProcess(orderId);
+
+		orderService.deleteOrderHistory(customer.getUserId(), orderId);
+		OrderHistoryPageResponse response = orderService.getOrderHistory(
+			customer.getUserId(), null, 10
+		);
+		assertThat(response.orders()).isEmpty();
+	}
+
+	@Test
+	void 없는_주문_삭제시_예외발생() {
+		assertThatThrownBy(() -> orderService.deleteOrderHistory(customer.getUserId(), "없는ID"))
+			.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	private String createTestOrder() {
@@ -156,5 +290,21 @@ class OrderServiceTest {
 		);
 		em.persist(menu);
 		return menu;
+	}
+
+	private void assertOrderStatus(String orderId, OrderStatus expected) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new AssertionError("주문을 찾을 수 없습니다: " + orderId));
+		assertThat(order.getCurrentStatus()).isEqualTo(expected);
+	}
+
+	private void entireProcess(String orderId) {
+		orderService.acceptOrder(orderId);
+		orderService.startCooking(orderId);
+		orderService.completeCooking(orderId);
+		orderService.requestDispatch(orderId);
+		orderService.completeDispatch(orderId);
+		orderService.startDelivery(orderId);
+		orderService.completeDelivery(orderId);
 	}
 }
