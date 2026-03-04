@@ -65,4 +65,8 @@ public class User {
 		String username, String password, String phoneNumber) {
 		return new User(loginType, email, username, password, phoneNumber);
 	}
+
+	public boolean matchPassword(String inputPassword) {
+		return this.password.equals(inputPassword);
+	}
 }
