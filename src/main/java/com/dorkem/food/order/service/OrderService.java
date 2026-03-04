@@ -18,15 +18,14 @@ import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
 import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderItem;
-import com.dorkem.food.order.entity.embedded.CustomerInfo;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 import com.dorkem.food.order.repository.OrderQueryRepository;
 import com.dorkem.food.order.repository.OrderRepository;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.repository.StoreRepository;
-import com.dorkem.food.user.entity.User;
-import com.dorkem.food.user.repository.UserRepository;
+import com.dorkem.food.user.entity.Customer;
+import com.dorkem.food.user.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,16 +35,14 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final OrderQueryRepository orderQueryRepository;
 	private final StoreRepository storeRepository;
-	private final UserRepository userRepository;
+	private final CustomerRepository customerRepository;
 	private final MenuRepository menuRepository;
 
 	@Transactional
 	public String createOrder(Long userId, OrderCreateRequest request) {
-		User user = getUser(userId);
+		Customer customer = getCustomer(userId);
 		Store store = getStore(request.storeId());
 		List<OrderItem> orderItems = getOrderItems(request.items());
-
-		CustomerInfo customerInfo = new CustomerInfo(user, user.getPhoneNumber());
 
 		OrderRequirement orderRequirement = new OrderRequirement(
 			request.requestToStore(),
@@ -62,7 +59,7 @@ public class OrderService {
 			deliveryReq.deliveryDirections()
 		);
 
-		Order order = Order.createOrder(store, customerInfo, orderRequirement, userDeliveryInfo, orderItems);
+		Order order = Order.createOrder(store, customer, orderRequirement, userDeliveryInfo, orderItems);
 		orderRepository.save(order);
 
 		return order.getOrderId();
@@ -70,7 +67,7 @@ public class OrderService {
 
 	@Transactional(readOnly = true)
 	public OrderResponse getCurrentUserOrders(Long userId) {
-		Order order = orderQueryRepository.findByUserCurrentOrder(userId)
+		Order order = orderQueryRepository.findByCurrentOrder(userId)
 			.orElseThrow(() -> new IllegalArgumentException("현재 진행 중인 주문이 없습니다."));
 
 		return createOrderResponse(order);
@@ -207,9 +204,9 @@ public class OrderService {
 			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));
 	}
 
-	private User getUser(Long userId) {
-		return userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+	private Customer getCustomer(Long userId) {
+		return customerRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 고객을 찾을 수 없습니다."));
 	}
 
 	private Store getStore(Long storeId) {

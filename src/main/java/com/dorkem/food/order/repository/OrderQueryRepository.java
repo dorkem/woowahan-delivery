@@ -18,34 +18,34 @@ public class OrderQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Optional<Order> findByUserCurrentOrder(long userId) {
+	public Optional<Order> findByCurrentOrder(Long customerId) {
 		Order order = queryFactory
 			.selectFrom(QOrder.order)
 			.where(
-				QOrder.order.customerInfo.user.userId.eq(userId),
+				QOrder.order.customer.customerId.eq(customerId),
 				QOrder.order.isActive.isTrue()
 			)
 			.fetchOne();
 		return Optional.ofNullable(order);
 	}
 
-	public Optional<Order> findOrderDetail(Long userId, String orderId) {
+	public Optional<Order> findOrderDetail(Long customerId, String orderId) {
 		Order order = queryFactory
 			.selectFrom(QOrder.order)
 			.where(
 				QOrder.order.orderId.eq(orderId),
-				QOrder.order.customerInfo.user.userId.eq(userId),
+				QOrder.order.customer.customerId.eq(customerId),
 				QOrder.order.isDeleted.isFalse()
 			)
 			.fetchOne();
 		return Optional.ofNullable(order);
 	}
 
-	public List<Order> findOrderHistory(Long userId, LocalDateTime cursor, int limit) {
+	public List<Order> findOrderHistory(Long customerId, LocalDateTime cursor, int limit) {
 		return queryFactory
 			.selectFrom(QOrder.order)
 			.where(
-				QOrder.order.customerInfo.user.userId.eq(userId),
+				QOrder.order.customer.customerId.eq(customerId),
 				QOrder.order.isDeleted.isFalse(),
 				QOrder.order.createdAt.lt(cursor)
 			)

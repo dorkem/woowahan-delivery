@@ -66,7 +66,7 @@ public record OrderResponse(
 				order.getOrderRequirement().getRequestToStore(),
 				order.getOrderRequirement().isNoCutlery(),
 				order.getOrderRequirement().isNoSideDish(),
-				order.getCustomerInfo().getUserPhoneNumber(),
+				order.getCustomer().getPhoneNumber(),
 				order.getOrderItems().stream()
 					.map(OrderItemResponse::createOrderItemResponse)
 					.toList(),
