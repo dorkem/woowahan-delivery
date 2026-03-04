@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dorkem.food.common.response.ResponseDto;
 import com.dorkem.food.store.service.StoreService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,38 +18,38 @@ public class StoreController {
 	private final StoreService storeService;
 
 	@PatchMapping("/{storeId}/orders/{orderId}/accept")
-	public ResponseEntity<Void> acceptOrder(
+	public ResponseEntity<ResponseDto<Void>> acceptOrder(
 		@PathVariable Long storeId,
 		@PathVariable String orderId
 	) {
 		storeService.acceptOrder(storeId, orderId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(ResponseDto.ok(null));
 	}
 
 	@PatchMapping("/{storeId}/orders/{orderId}/reject")
-	public ResponseEntity<Void> rejectOrder(
+	public ResponseEntity<ResponseDto<Void>> rejectOrder(
 		@PathVariable Long storeId,
 		@PathVariable String orderId
 	) {
 		storeService.rejectOrder(storeId, orderId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(ResponseDto.ok(null));
 	}
 
 	@PatchMapping("/{storeId}/orders/{orderId}/cooking")
-	public ResponseEntity<Void> startCooking(
+	public ResponseEntity<ResponseDto<Void>> startCooking(
 		@PathVariable Long storeId,
 		@PathVariable String orderId
 	) {
 		storeService.startCooking(storeId, orderId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(ResponseDto.ok(null));
 	}
 
 	@PatchMapping("/{storeId}/orders/{orderId}/cook-complete")
-	public ResponseEntity<Void> completeCooking(
+	public ResponseEntity<ResponseDto<Void>> completeCooking(
 		@PathVariable Long storeId,
 		@PathVariable String orderId
 	) {
 		storeService.completeCookingAndRequestDispatch(storeId, orderId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(ResponseDto.ok(null));
 	}
 }

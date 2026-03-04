@@ -9,6 +9,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dorkem.food.common.exception.CommonException;
+import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.menu.repository.MenuRepository;
 import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
@@ -68,7 +70,7 @@ public class OrderService {
 	@Transactional(readOnly = true)
 	public OrderResponse getCurrentUserOrders(Long userId) {
 		Order order = orderQueryRepository.findByCurrentOrder(userId)
-			.orElseThrow(() -> new IllegalArgumentException("현재 진행 중인 주문이 없습니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CURRENT_ORDER));
 
 		return createOrderResponse(order);
 	}
@@ -76,7 +78,7 @@ public class OrderService {
 	@Transactional(readOnly = true)
 	public HistoryDetailResponse getOrderDetail(Long userId, String orderId) {
 		Order order = orderQueryRepository.findOrderDetail(userId, orderId)
-			.orElseThrow(() -> new IllegalArgumentException("주문내역을 찾을 수 없습니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER_HISTORY));
 
 		return HistoryDetailResponse.createHistoryDetailResponse(order);
 	}
@@ -125,7 +127,7 @@ public class OrderService {
 	@Transactional
 	public void deleteOrderHistory(Long userId, String orderId) {
 		Order order = orderQueryRepository.findOrderDetail(userId, orderId)
-			.orElseThrow(() -> new IllegalArgumentException("주문 내역을 찾을 수 없습니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER_HISTORY));
 
 		order.deactivate();
 	}
@@ -197,21 +199,19 @@ public class OrderService {
 		order.cancel();
 	}
 
-	// TODO: IllegalArgumentException로만 처리하면 상태코드로 400만 내뱉는다고 함
-	// 유저가 없을 때: 회원가입 페이지로 유도하는 등의 로직을 구현하기위해 구현고려
 	private Order getOrder(String orderId) {
 		return orderRepository.findById(orderId)
-			.orElseThrow(() -> new IllegalArgumentException(orderId + "의 주문이 없습니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
 	}
 
 	private Customer getCustomer(Long userId) {
 		return customerRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 고객을 찾을 수 없습니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 
 	private Store getStore(Long storeId) {
 		return storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 가게를 찾을 수 없습니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_STORE));
 	}
 
 	private List<OrderItem> getOrderItems(List<OrderCreateItemRequest> request) {
@@ -219,7 +219,7 @@ public class OrderService {
 
 		for (OrderCreateItemRequest itemReq : request) {
 			Menu menu = menuRepository.findById(itemReq.menuId())
-				.orElseThrow(() -> new IllegalArgumentException("메뉴 정보를 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENU));
 
 			orderItems.add(OrderItem.createOrderItem(menu, itemReq.quantity()));
 		}
