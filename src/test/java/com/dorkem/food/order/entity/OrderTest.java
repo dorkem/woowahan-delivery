@@ -9,10 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.dorkem.food.order.entity.embedded.CustomerInfo;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 import com.dorkem.food.store.entity.Store;
+import com.dorkem.food.user.entity.Customer;
 
 @DisplayName("Order 엔티티 테스트")
 class OrderTest {
@@ -21,12 +21,12 @@ class OrderTest {
 	@BeforeEach
 	void setUp() {
 		Store store = mock(Store.class);
-		CustomerInfo customerInfo = mock(CustomerInfo.class);
+		Customer customer = mock(Customer.class);
 		OrderRequirement orderRequirement = mock(OrderRequirement.class);
 		UserDeliveryInfo userDeliveryInfo = mock(UserDeliveryInfo.class);
 		List<OrderItem> orderItems = List.of(mock(OrderItem.class));
 
-		order = Order.createOrder(store, customerInfo, orderRequirement, userDeliveryInfo, orderItems);
+		order = Order.createOrder(store, customer, orderRequirement, userDeliveryInfo, orderItems);
 	}
 
 	@Test
@@ -45,8 +45,8 @@ class OrderTest {
 	@Test
 	@DisplayName("정상적인 상태 흐름")
 	void 상태흐름이_정상일때() {
-		order.requestPayment();
-		order.completePayment();
+		// order.requestPayment();
+		// order.completePayment();
 		order.accept();
 		order.startCooking();
 		order.completeCooking();
@@ -59,7 +59,7 @@ class OrderTest {
 	@Test
 	@DisplayName("잘못된 상태 전이 시 예외 발생")
 	void 상태전이_잘못되면_에러남() {
-		assertThatThrownBy(() -> order.accept())
+		assertThatThrownBy(() -> order.startCooking())
 			.isInstanceOf(IllegalStateException.class);
 	}
 

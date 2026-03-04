@@ -24,12 +24,13 @@ import com.dorkem.food.order.entity.OrderStatus;
 import com.dorkem.food.order.repository.OrderRepository;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.entity.StoreStatus;
+import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.LoginType;
+import com.dorkem.food.user.entity.Owner;
 import com.dorkem.food.user.entity.User;
 import com.dorkem.food.user.entity.UserType;
 
 import jakarta.persistence.EntityManager;
-
 import jakarta.persistence.PersistenceContext;
 
 @SpringBootTest
@@ -44,18 +45,20 @@ class OrderServiceTest {
 	@Autowired
 	OrderRepository orderRepository;
 
-	User customer;
-	User owner;
+	Customer customer;
+	Owner owner;
 	Store store;
 	Menu bbulingCle;
 	Menu cheeseBall;
 
 	@BeforeEach
 	void setUp() {
-		customer = createUser("최재혁", "password", "jaehyeok@ar.co.kr", "123-4567-8910",
-			LoginType.KAKAO, UserType.CUSTOMER);
-		owner = createUser("NEO", "password", "neo@ar.co.kr", "109-8765-4321",
-			LoginType.KAKAO, UserType.OWNER);
+		User customerUser = createUser("최재혁", "password", "jaehyeok@ar.co.kr", "123-4567-8910", LoginType.KAKAO,
+			UserType.CUSTOMER);
+		customer = createCustomer(customerUser);
+		User ownerUser = createUser("NEO", "password", "neo@ar.co.kr", "109-8765-4321", LoginType.KAKAO,
+			UserType.OWNER);
+		owner = createOwner(ownerUser, "109-87-65432", "NEO");
 		store = createStore(owner);
 		bbulingCle = createMenu(store, "뿌링클", "맛있음", 20000);
 		cheeseBall = createMenu(store, "치즈볼", "진짜맛있음", 5000);
@@ -80,7 +83,7 @@ class OrderServiceTest {
 			false
 		);
 
-		String orderId = orderService.createOrder(customer.getUserId(), request);
+		String orderId = orderService.createOrder(customer.getCustomerId(), request);
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new AssertionError("주문이 생성되지 않았습니다."));
@@ -112,7 +115,7 @@ class OrderServiceTest {
 			"-", false, false
 		);
 
-		assertThatThrownBy(() -> orderService.createOrder(customer.getUserId(), request))
+		assertThatThrownBy(() -> orderService.createOrder(customer.getCustomerId(), request))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
 
@@ -173,14 +176,14 @@ class OrderServiceTest {
 	@Test
 	void 현재_진행중인_주문_조회_성공() {
 		String orderId = createTestOrder();
-		OrderResponse response = orderService.getCurrentUserOrders(customer.getUserId());
+		OrderResponse response = orderService.getCurrentUserOrders(customer.getCustomerId());
 		assertThat(response).isNotNull();
 		assertThat(response.orderId()).isEqualTo(orderId);
 	}
 
 	@Test
 	void 진행중인_주문이_없으면_예외발생() {
-		assertThatThrownBy(() -> orderService.getCurrentUserOrders(customer.getUserId()))
+		assertThatThrownBy(() -> orderService.getCurrentUserOrders(customer.getCustomerId()))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
 
@@ -192,7 +195,7 @@ class OrderServiceTest {
 		String orderId2 = createTestOrder();
 		entireProcess(orderId2);
 
-		OrderHistoryPageResponse response = orderService.getOrderHistory(customer.getUserId(), null, 10);
+		OrderHistoryPageResponse response = orderService.getOrderHistory(customer.getCustomerId(), null, 10);
 		assertThat(response.orders()).hasSize(2);
 		assertThat(response.hasNext()).isFalse();
 	}
@@ -205,13 +208,13 @@ class OrderServiceTest {
 		}
 
 		OrderHistoryPageResponse firstPage = orderService.getOrderHistory(
-			customer.getUserId(), null, 2
+			customer.getCustomerId(), null, 2
 		);
 		assertThat(firstPage.orders()).hasSize(2);
 		assertThat(firstPage.hasNext()).isTrue();
 
 		OrderHistoryPageResponse secondPage = orderService.getOrderHistory(
-			customer.getUserId(), firstPage.nextCursor(), 2
+			customer.getCustomerId(), firstPage.nextCursor(), 2
 		);
 		assertThat(secondPage.orders()).hasSize(1);
 		assertThat(secondPage.hasNext()).isFalse();
@@ -222,16 +225,16 @@ class OrderServiceTest {
 		String orderId = createTestOrder();
 		entireProcess(orderId);
 
-		orderService.deleteOrderHistory(customer.getUserId(), orderId);
+		orderService.deleteOrderHistory(customer.getCustomerId(), orderId);
 		OrderHistoryPageResponse response = orderService.getOrderHistory(
-			customer.getUserId(), null, 10
+			customer.getCustomerId(), null, 10
 		);
 		assertThat(response.orders()).isEmpty();
 	}
 
 	@Test
 	void 없는_주문_삭제시_예외발생() {
-		assertThatThrownBy(() -> orderService.deleteOrderHistory(customer.getUserId(), "없는ID"))
+		assertThatThrownBy(() -> orderService.deleteOrderHistory(customer.getCustomerId(), "없는ID"))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
 
@@ -247,7 +250,7 @@ class OrderServiceTest {
 			false,
 			false
 		);
-		return orderService.createOrder(customer.getUserId(), request);
+		return orderService.createOrder(customer.getCustomerId(), request);
 	}
 
 	private User createUser(String userName, String password, String email,
@@ -264,7 +267,19 @@ class OrderServiceTest {
 		return user;
 	}
 
-	private Store createStore(User owner) {
+	private Customer createCustomer(User user) {
+		Customer customer = Customer.createCustomer(user);
+		em.persist(customer);
+		return customer;
+	}
+
+	private Owner createOwner(User user, String businessNumber, String ownerName) {
+		Owner owner = Owner.createOwner(user, businessNumber, ownerName);
+		em.persist(owner);
+		return owner;
+	}
+
+	private Store createStore(Owner owner) {
 		Store store = Store.createStore(
 			owner,
 			"BBQ",
