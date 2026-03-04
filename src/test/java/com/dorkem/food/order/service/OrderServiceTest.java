@@ -28,7 +28,6 @@ import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.LoginType;
 import com.dorkem.food.user.entity.Owner;
 import com.dorkem.food.user.entity.User;
-import com.dorkem.food.user.entity.UserType;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -53,11 +52,9 @@ class OrderServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		User customerUser = createUser("최재혁", "password", "jaehyeok@ar.co.kr", "123-4567-8910", LoginType.KAKAO,
-			UserType.CUSTOMER);
+		User customerUser = createUser("최재혁", "password", "jaehyeok@ar.co.kr", "123-4567-8910", LoginType.KAKAO);
 		customer = createCustomer(customerUser);
-		User ownerUser = createUser("NEO", "password", "neo@ar.co.kr", "109-8765-4321", LoginType.KAKAO,
-			UserType.OWNER);
+		User ownerUser = createUser("NEO", "password", "neo@ar.co.kr", "109-8765-4321", LoginType.KAKAO);
 		owner = createOwner(ownerUser, "109-87-65432", "NEO");
 		store = createStore(owner);
 		bbulingCle = createMenu(store, "뿌링클", "맛있음", 20000);
@@ -254,10 +251,9 @@ class OrderServiceTest {
 	}
 
 	private User createUser(String userName, String password, String email,
-		String phoneNumber, LoginType loginType, UserType userType) {
+		String phoneNumber, LoginType loginType) {
 		User user = User.createUser(
 			loginType,
-			userType,
 			email,
 			userName,
 			password,

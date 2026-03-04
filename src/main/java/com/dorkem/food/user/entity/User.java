@@ -34,10 +34,6 @@ public class User {
 	@Column(name = "login_type", nullable = false)
 	private LoginType loginType;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "user_type", nullable = false)
-	private UserType userType;
-
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
@@ -55,18 +51,18 @@ public class User {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	private User(LoginType loginType, UserType userType, String email,
-		String username, String password, String phoneNumber) {
+	private User(LoginType loginType, String email, String username,
+		String password, String phoneNumber
+	) {
 		this.loginType = loginType;
-		this.userType = userType;
 		this.email = email;
 		this.username = username;
 		this.password = password;
 		this.phoneNumber = phoneNumber;
 	}
 
-	public static User createUser(LoginType loginType, UserType userType, String email,
+	public static User createUser(LoginType loginType, String email,
 		String username, String password, String phoneNumber) {
-		return new User(loginType, userType, email, username, password, phoneNumber);
+		return new User(loginType, email, username, password, phoneNumber);
 	}
 }
