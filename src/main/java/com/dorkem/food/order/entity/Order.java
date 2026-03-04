@@ -8,10 +8,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.dorkem.food.order.entity.embedded.CustomerInfo;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 import com.dorkem.food.store.entity.Store;
+import com.dorkem.food.user.entity.Customer;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,6 +48,10 @@ public class Order {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "customer_id")
+	private Customer customer;
+
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -57,9 +61,6 @@ public class Order {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", nullable = false)
 	private OrderStatus currentStatus;
-
-	@Embedded
-	private CustomerInfo customerInfo;
 
 	@Embedded
 	private OrderRequirement orderRequirement;
@@ -81,17 +82,17 @@ public class Order {
 	@Column(name = "modified_at", nullable = false)
 	private LocalDateTime modifiedAt;
 
-	private Order(Store store, CustomerInfo customerInfo, OrderRequirement orderRequirement,
+	private Order(Store store, Customer customer, OrderRequirement orderRequirement,
 		UserDeliveryInfo userDeliveryInfo) {
 		this.store = store;
-		this.customerInfo = customerInfo;
+		this.customer = customer;
 		this.orderRequirement = orderRequirement;
 		this.userDeliveryInfo = userDeliveryInfo;
 	}
 
-	public static Order createOrder(Store store, CustomerInfo customerInfo, OrderRequirement orderRequirement,
+	public static Order createOrder(Store store, Customer customer, OrderRequirement orderRequirement,
 		UserDeliveryInfo userDeliveryInfo, List<OrderItem> orderItems) {
-		Order order = new Order(store, customerInfo, orderRequirement, userDeliveryInfo);
+		Order order = new Order(store, customer, orderRequirement, userDeliveryInfo);
 		orderItems.forEach(order::addOrderItem);
 		order.initStatus();
 		return order;
@@ -168,8 +169,8 @@ public class Order {
 		return store.getStoreName();
 	}
 
-	public CustomerInfo getCustomerInfo() {
-		return customerInfo;
+	public Customer getCustomer() {
+		return customer;
 	}
 
 	public UserDeliveryInfo getUserDeliveryInfo() {

@@ -9,7 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.dorkem.food.order.entity.Order;
-import com.dorkem.food.user.entity.User;
+import com.dorkem.food.user.entity.Owner;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +43,7 @@ public class Store {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner_id", nullable = false)
-	private User owner;
+	private Owner owner;
 
 	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
@@ -87,7 +87,7 @@ public class Store {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	private Store(User owner, String storeName, String businessNumber, String storeAddress,
+	private Store(Owner owner, String storeName, String businessNumber, String storeAddress,
 		String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
 		StoreStatus status, LocalTime openTime, LocalTime closeTime,
 		int minOrderAmount, int baseDeliveryFee
@@ -106,7 +106,7 @@ public class Store {
 		this.baseDeliveryFee = baseDeliveryFee;
 	}
 
-	public static Store createStore(User owner, String storeName, String businessNumber, String storeAddress,
+	public static Store createStore(Owner owner, String storeName, String businessNumber, String storeAddress,
 		String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
 		StoreStatus status, LocalTime openTime, LocalTime closeTime,
 		int minOrderAmount, int baseDeliveryFee
