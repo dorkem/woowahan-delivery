@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dorkem.food.common.response.ResponseDto;
 import com.dorkem.food.user.dto.request.LoginRequest;
+import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
+import com.dorkem.food.user.dto.response.AccessTokenResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
 import com.dorkem.food.user.service.UserService;
 
@@ -38,6 +40,14 @@ public class UserController {
 		@RequestBody LoginRequest request
 	) {
 		LoginResponse response = userService.login(request);
+		return ResponseEntity.ok(ResponseDto.ok(response));
+	}
+
+	@PostMapping("/auth/refresh")
+	public ResponseEntity<ResponseDto<AccessTokenResponse>> refresh(
+		@RequestBody RefreshTokenRequest request
+	) {
+		AccessTokenResponse response = userService.refreshAccessToken(request);
 		return ResponseEntity.ok(ResponseDto.ok(response));
 	}
 

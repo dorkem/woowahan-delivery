@@ -7,7 +7,9 @@ import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.common.jwt.JwtProvider;
 import com.dorkem.food.user.dto.request.LoginRequest;
+import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
+import com.dorkem.food.user.dto.response.AccessTokenResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.User;
@@ -63,6 +65,20 @@ public class UserService {
 		return new LoginResponse(accessToken, refreshToken);
 	}
 
+	@Transactional(readOnly = true)
+	public AccessTokenResponse refreshAccessToken(RefreshTokenRequest request) {
+		String oldRefreshToken = request.refreshToken();
+		isTokenValid(oldRefreshToken);
+
+		Long userId = jwtProvider.getUserIdFromToken(oldRefreshToken);
+		RefreshToken savedToken = getStoredRefreshToken(userId);
+
+		matchWithStoredTorken(savedToken, oldRefreshToken);
+		String newAccessToken = jwtProvider.createAccessToken(userId);
+
+		return new AccessTokenResponse(newAccessToken);
+	}
+
 	@Transactional
 	public void logout(Long userId) {
 		refreshTokenRepository.deleteByUserId(userId);
@@ -77,5 +93,22 @@ public class UserService {
 	private User getUser(LoginRequest request) {
 		return userRepository.findByEmail(request.email())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+	}
+
+	private void isTokenValid(String oldRefreshToken) {
+		if (!jwtProvider.validateToken(oldRefreshToken)) {
+			throw new CommonException(ErrorCode.EXPIRED_TOKEN_ERROR);
+		}
+	}
+
+	private RefreshToken getStoredRefreshToken(Long userId) {
+		return refreshTokenRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.INVALID_TOKEN_ERROR));
+	}
+
+	private static void matchWithStoredTorken(RefreshToken savedToken, String oldRefreshToken) {
+		if (!savedToken.getToken().equals(oldRefreshToken)) {
+			throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
+		}
 	}
 }
