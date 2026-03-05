@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -29,5 +30,28 @@ public class JwtProvider {
 			.setExpiration(new Date(System.currentTimeMillis() + tokenValidTime))
 			.signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
 			.compact();
+	}
+
+	public Long getUserIdFromToken(String token) {
+		return Long.valueOf(
+			Jwts.parserBuilder()
+				.setSigningKey(SECRET_KEY.getBytes())
+				.build()
+				.parseClaimsJws(token)
+				.getBody()
+				.getSubject()
+		);
+	}
+
+	public boolean validateToken(String token) {
+		try {
+			Jwts.parserBuilder()
+				.setSigningKey(SECRET_KEY.getBytes())
+				.build()
+				.parseClaimsJws(token);
+			return true;
+		} catch (JwtException | IllegalArgumentException e) {
+			return false;
+		}
 	}
 }
