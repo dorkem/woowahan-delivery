@@ -76,7 +76,7 @@ public class UserService {
 		Long userId = jwtProvider.getUserIdFromToken(oldRefreshToken);
 		RefreshToken savedToken = getStoredRefreshToken(userId);
 
-		matchWithStoredTorken(savedToken, oldRefreshToken);
+		matchWithStoredToken(savedToken, oldRefreshToken);
 		String newAccessToken = jwtProvider.createAccessToken(userId);
 
 		return new AccessTokenResponse(newAccessToken);
@@ -140,7 +140,7 @@ public class UserService {
 			.orElseThrow(() -> new CommonException(ErrorCode.INVALID_TOKEN_ERROR));
 	}
 
-	private static void matchWithStoredTorken(RefreshToken savedToken, String oldRefreshToken) {
+	private static void matchWithStoredToken(RefreshToken savedToken, String oldRefreshToken) {
 		if (!savedToken.getToken().equals(oldRefreshToken)) {
 			throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
 		}
