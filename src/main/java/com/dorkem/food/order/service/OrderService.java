@@ -85,31 +85,19 @@ public class OrderService {
 
 	@Transactional(readOnly = true)
 	public OrderHistoryPageResponse getOrderHistory(Long userId, String cursor, int size) {
-		LocalDateTime cursorTime = null;
-		if (cursor == null || cursor.isBlank()) {
-			cursorTime = LocalDateTime.now();
-		} else if (cursor != null && !cursor.isBlank()) {
-			cursorTime = LocalDateTime.parse(cursor);
-		}
+		LocalDateTime cursorTime = (cursor == null || cursor.isBlank())
+			? LocalDateTime.now()
+			: LocalDateTime.parse(cursor);
 
 		// 6개 가져오고 이후에 데이터가 있는지 확인
 		List<Order> orders = orderQueryRepository.findOrderHistory(userId, cursorTime, size + 1);
 		boolean hasNext = orders.size() > size;
 
-		List<Order> content = null;
-		if (hasNext) {
-			content = orders.subList(0, size);
-		} else if (!hasNext) {
-			content = orders;
-		}
+		List<Order> content = hasNext ? orders.subList(0, size) : orders;
 
-		// 다음 위치 파악하는 것
-		String nextCursor = null;
-		if (hasNext) {
-			nextCursor = content.get(content.size() - 1).getCreatedAt().toString();
-		} else if (!hasNext) {
-			nextCursor = null;
-		}
+		String nextCursor = hasNext
+			? content.get(content.size() - 1).getCreatedAt().toString()
+			: null;
 
 		List<HistoryResponse> responseList = new ArrayList<>();
 		for (Order order : content) {
