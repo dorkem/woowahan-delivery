@@ -10,9 +10,11 @@ import com.dorkem.food.user.dto.request.LoginRequest;
 import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
+import com.dorkem.food.user.dto.response.KakaoUserInfoResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.User;
+import com.dorkem.food.user.entity.auth.KakaoAuthClient;
 import com.dorkem.food.user.entity.auth.RefreshToken;
 import com.dorkem.food.user.repository.CustomerRepository;
 import com.dorkem.food.user.repository.RefreshTokenRepository;
@@ -27,7 +29,8 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final CustomerRepository customerRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
-	private JwtProvider jwtProvider;
+	private final JwtProvider jwtProvider;
+	private final KakaoAuthClient kakaoAuthClient;
 
 	@Transactional
 	public Long signup(SignupRequest request) {
@@ -50,19 +53,19 @@ public class UserService {
 	public LoginResponse login(LoginRequest request) {
 		User user = getUser(request);
 		matchPassword(request, user);
+		return issueTokens(user);
+	}
 
-		String accessToken = jwtProvider.createAccessToken(user.getUserId());
-		String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+	public String getKakaoLoginUrl() {
+		return kakaoAuthClient.getLoginUrl();
+	}
 
-		RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getUserId())
-			.map(token -> {
-				token.updateToken(refreshToken);
-				return token;
-			})
-			.orElse(new RefreshToken(user.getUserId(), refreshToken));
-		refreshTokenRepository.save(refreshTokenEntity);
-
-		return new LoginResponse(accessToken, refreshToken);
+	@Transactional
+	public LoginResponse kakaoLogin(String code) {
+		String kakaoAccessToken = kakaoAuthClient.getAccessToken(code);
+		KakaoUserInfoResponse kakaoInfo = kakaoAuthClient.getUserInfo(kakaoAccessToken);
+		User user = createKakaoUser(kakaoInfo);
+		return issueTokens(user);
 	}
 
 	@Transactional(readOnly = true)
@@ -93,6 +96,37 @@ public class UserService {
 	private User getUser(LoginRequest request) {
 		return userRepository.findByEmail(request.email())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+	}
+
+	private User createKakaoUser(KakaoUserInfoResponse kakaoInfo) {
+		return userRepository.findByKakaoId(kakaoInfo.getKakaoId())
+			.orElseGet(() -> registKakaoUser(kakaoInfo));
+	}
+
+	private User registKakaoUser(KakaoUserInfoResponse kakaoInfo) {
+		User newUser = User.createKakaoUser(
+			kakaoInfo.getKakaoId(),
+			kakaoInfo.getNickname(),
+			kakaoInfo.getEmail()
+		);
+		userRepository.save(newUser);
+		customerRepository.save(Customer.createCustomer(newUser));
+		return newUser;
+	}
+
+	private LoginResponse issueTokens(User user) {
+		String accessToken = jwtProvider.createAccessToken(user.getUserId());
+		String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+
+		RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getUserId())
+			.map(token -> {
+				token.updateToken(refreshToken);
+				return token;
+			})
+			.orElse(new RefreshToken(user.getUserId(), refreshToken));
+		refreshTokenRepository.save(refreshTokenEntity);
+
+		return new LoginResponse(accessToken, refreshToken);
 	}
 
 	private void isTokenValid(String oldRefreshToken) {

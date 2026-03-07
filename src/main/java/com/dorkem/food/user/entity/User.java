@@ -40,11 +40,15 @@ public class User {
 	@Column(name = "username", nullable = false)
 	private String username;
 
-	@Column(name = "password", nullable = false)
+	@Getter
+	@Column(name = "kakao_id", unique = true)
+	private Long kakaoId;
+
+	@Column(name = "password")
 	private String password;
 
 	@Getter
-	@Column(name = "phone_number", nullable = false, unique = true)
+	@Column(name = "phone_number", unique = true)
 	private String phoneNumber;
 
 	@CreatedDate
@@ -61,9 +65,20 @@ public class User {
 		this.phoneNumber = phoneNumber;
 	}
 
+	private User(Long kakaoId, String username, String email) {
+		this.kakaoId = kakaoId;
+		this.username = username;
+		this.email = email;
+		this.loginType = LoginType.KAKAO;
+	}
+
 	public static User createUser(LoginType loginType, String email,
 		String username, String password, String phoneNumber) {
 		return new User(loginType, email, username, password, phoneNumber);
+	}
+
+	public static User createKakaoUser(Long kakaoId, String username, String email) {
+		return new User(kakaoId, username, email);
 	}
 
 	public boolean matchPassword(String inputPassword) {
