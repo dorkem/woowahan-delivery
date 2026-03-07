@@ -3,15 +3,20 @@ package com.dorkem.food.store.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.dorkem.food.category.entity.Category;
 import com.dorkem.food.order.entity.Order;
+import com.dorkem.food.review.entity.Review;
+import com.dorkem.food.store.entity.embedded.StoreReviewStatus;
 import com.dorkem.food.user.entity.Owner;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -45,6 +50,21 @@ public class Store {
 	@JoinColumn(name = "owner_id", nullable = false)
 	private Owner owner;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_id", nullable = false)
+	private Category category;
+
+	@Getter
+	@Column(name = "thumbnail")
+	private String thumbnail;
+
+	@Getter
+	@Embedded
+	StoreReviewStatus reviewStatus = new StoreReviewStatus();
+
+	@OneToMany(mappedBy = "store")
+	private List<Review> reviews = new ArrayList<>();
+
 	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
 
@@ -77,6 +97,7 @@ public class Store {
 	@Column(name = "close_time")
 	private LocalTime closeTime;
 
+	@Getter
 	@Column(name = "min_order_amount", nullable = false)
 	private int minOrderAmount;
 
@@ -87,12 +108,12 @@ public class Store {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	private Store(Owner owner, String storeName, String businessNumber, String storeAddress,
-		String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
-		StoreStatus status, LocalTime openTime, LocalTime closeTime,
-		int minOrderAmount, int baseDeliveryFee
+	private Store(Owner owner, Category category, String thumbnail, String storeName, String businessNumber,
+		String storeAddress, String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
+		StoreStatus status, LocalTime openTime, LocalTime closeTime, int minOrderAmount, int baseDeliveryFee
 	) {
 		this.owner = owner;
+		this.category = category;
 		this.storeName = storeName;
 		this.businessNumber = businessNumber;
 		this.storeAddress = storeAddress;
@@ -106,14 +127,21 @@ public class Store {
 		this.baseDeliveryFee = baseDeliveryFee;
 	}
 
-	public static Store createStore(Owner owner, String storeName, String businessNumber, String storeAddress,
-		String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
-		StoreStatus status, LocalTime openTime, LocalTime closeTime,
-		int minOrderAmount, int baseDeliveryFee
+	public static Store createStore(Owner owner, Category category, String thumbnail,
+		String storeName, String businessNumber, String storeAddress, String storeAddressDetails,
+		BigDecimal latitude, BigDecimal longitude, StoreStatus status, LocalTime openTime,
+		LocalTime closeTime, int minOrderAmount, int baseDeliveryFee
 	) {
 		return new Store(
-			owner, storeName, businessNumber, storeAddress, storeAddressDetails,
+			owner, category, thumbnail, storeName, businessNumber, storeAddress, storeAddressDetails,
 			latitude, longitude, status, openTime, closeTime, minOrderAmount, baseDeliveryFee
 		);
+	}
+
+	public void addReview(Review review) {
+		this.reviews.add(review);
+		review.assignStore(this);
+
+		this.reviewStatus = this.reviewStatus.addReview(review.getRating());
 	}
 }

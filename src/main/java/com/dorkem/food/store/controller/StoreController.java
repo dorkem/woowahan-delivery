@@ -1,12 +1,16 @@
 package com.dorkem.food.store.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dorkem.food.common.response.ResponseDto;
+import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
+import com.dorkem.food.store.dto.response.StorePageResponse;
 import com.dorkem.food.store.service.StoreService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreController {
 	private final StoreService storeService;
+
+	@GetMapping
+	public ResponseEntity<ResponseDto<StorePageResponse>> getStores(
+		@RequestParam int categoryId,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "15") int size
+	) {
+		return ResponseEntity.ok(ResponseDto.ok(storeService.getStores(categoryId, cursor, size)));
+	}
 
 	@PatchMapping("/{storeId}/orders/{orderId}/accept")
 	public ResponseEntity<ResponseDto<Void>> acceptOrder(
