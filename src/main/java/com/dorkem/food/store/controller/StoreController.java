@@ -1,5 +1,7 @@
 package com.dorkem.food.store.controller;
 
+import static com.dorkem.food.menu.dto.response.MenuResponse.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dorkem.food.common.response.ResponseDto;
-import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
+import com.dorkem.food.menu.service.MenuService;
 import com.dorkem.food.store.dto.response.StorePageResponse;
 import com.dorkem.food.store.service.StoreService;
 
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreController {
 	private final StoreService storeService;
+	private final MenuService menuService;
 
 	@GetMapping
 	public ResponseEntity<ResponseDto<StorePageResponse>> getStores(
@@ -28,6 +31,13 @@ public class StoreController {
 		@RequestParam(defaultValue = "15") int size
 	) {
 		return ResponseEntity.ok(ResponseDto.ok(storeService.getStores(categoryId, cursor, size)));
+	}
+
+	@GetMapping("/{storeId}/menus")
+	public ResponseEntity<ResponseDto<MenuListResponse>> getMenus(
+		@PathVariable Long storeId
+	) {
+		return ResponseEntity.ok(ResponseDto.ok(menuService.getMenusByStore(storeId)));
 	}
 
 	@PatchMapping("/{storeId}/orders/{orderId}/accept")
