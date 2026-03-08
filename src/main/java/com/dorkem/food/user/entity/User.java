@@ -37,6 +37,7 @@ public class User {
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
+	@Getter
 	@Column(name = "username", nullable = false)
 	private String username;
 

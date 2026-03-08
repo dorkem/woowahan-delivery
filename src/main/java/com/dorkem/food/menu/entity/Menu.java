@@ -39,6 +39,7 @@ public class Menu {
 	@Column(name = "menu_name", nullable = false)
 	private String menuName;
 
+	@Getter
 	@Column(name = "menu_description")
 	private String menuDescription;
 

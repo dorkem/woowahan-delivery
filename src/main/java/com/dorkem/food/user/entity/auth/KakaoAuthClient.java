@@ -43,7 +43,7 @@ public class KakaoAuthClient {
 		KakaoTokenResponse response = webClient.post()
 			.uri("https://kauth.kakao.com/oauth/token")
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-			.body(BodyInserters.fromFormData(params))  // ← bodyValue 대신 이걸로
+			.body(BodyInserters.fromFormData(params))
 			.retrieve()
 			.bodyToMono(KakaoTokenResponse.class)
 			.block();

@@ -101,6 +101,7 @@ public class Store {
 	@Column(name = "min_order_amount", nullable = false)
 	private int minOrderAmount;
 
+	@Getter
 	@Column(name = "base_delivery_fee", nullable = false)
 	private int baseDeliveryFee;
 
