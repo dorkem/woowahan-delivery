@@ -17,14 +17,6 @@ public class DeliveryController {
 
 	private final DeliveryService deliveryService;
 
-	@PatchMapping("/{orderId}/dispatch-complete")
-	public ResponseEntity<Void> completeDispatch(
-		@PathVariable String orderId
-	) {
-		deliveryService.completeDispatch(orderId);
-		return ResponseEntity.ok().build();
-	}
-
 	@PatchMapping("/{orderId}/start")
 	public ResponseEntity<Void> startDelivery(
 		@PathVariable String orderId

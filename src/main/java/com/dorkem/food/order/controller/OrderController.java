@@ -74,15 +74,6 @@ public class OrderController {
 		return ResponseEntity.ok(ResponseDto.ok(null));
 	}
 
-	// TODO: 근데 얘네 한 번 처리하면 막는 로직도 필요함: 계속 쌓인다.-엔티티에서 처리
-	@PatchMapping("/{orderId}/accept")
-	public ResponseEntity<ResponseDto<Void>> acceptOrder(
-		@PathVariable String orderId
-	) {
-		orderService.acceptOrder(orderId);
-		return ResponseEntity.ok(ResponseDto.ok(null));
-	}
-
 	@PatchMapping("/{orderId}/cancel")
 	public ResponseEntity<ResponseDto<Void>> cancelOrder(
 		@PathVariable String orderId
