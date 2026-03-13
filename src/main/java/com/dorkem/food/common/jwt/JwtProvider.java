@@ -14,8 +14,12 @@ public class JwtProvider {
 
 	@Value("${jwt.secret}")
 	private String SECRET_KEY;
-	private final long ACCESS_TOKEN_TIME = 1000 * 60 * 30;
-	private final long REFRESH_TOKEN_TIME = 1000 * 60 * 60 * 24 * 7;
+
+	@Value("${jwt.access-token-expiration}")
+	private long ACCESS_TOKEN_TIME;
+
+	@Value("${jwt.refresh-token-expiration}")
+	private long REFRESH_TOKEN_TIME;
 
 	public String createAccessToken(Long userId) {
 		return createToken(String.valueOf(userId), ACCESS_TOKEN_TIME);
