@@ -23,7 +23,7 @@ public class KakaoAuthClient implements OAuthClient {
 	@Value("${kakao.redirect-uri}")
 	private String redirectUri;
 
-	@Value("$kakao.client-secret")
+	@Value("${kakao.client-secret}")
 	private String clientSecret;
 
 	private final WebClient webClient = WebClient.create();
