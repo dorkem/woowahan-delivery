@@ -1,18 +1,21 @@
-package com.dorkem.food.user.entity.auth;
+package com.dorkem.food.oauth.entity.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import com.dorkem.food.user.dto.response.KakaoTokenResponse;
-import com.dorkem.food.user.dto.response.KakaoUserInfoResponse;
+import com.dorkem.food.oauth.entity.info.KakaoUserInfo;
+import com.dorkem.food.oauth.entity.info.OAuthUserInfo;
+import com.dorkem.food.oauth.response.KakaoTokenResponse;
+import com.dorkem.food.oauth.response.KakaoUserInfoResponse;
+import com.dorkem.food.user.entity.OAuthProvider;
 
 @Component
-public class KakaoAuthClient {
+public class KakaoAuthClient implements OAuthClient {
 
 	@Value("${kakao.client-id}")
 	private String clientId;
@@ -20,11 +23,12 @@ public class KakaoAuthClient {
 	@Value("${kakao.redirect-uri}")
 	private String redirectUri;
 
-	@Value("${kakao.client-secret}")
+	@Value("$kakao.client-secret")
 	private String clientSecret;
 
 	private final WebClient webClient = WebClient.create();
 
+	@Override
 	public String getLoginUrl() {
 		return "https://kauth.kakao.com/oauth/authorize"
 			+ "?client_id=" + clientId
@@ -32,6 +36,7 @@ public class KakaoAuthClient {
 			+ "&response_type=code";
 	}
 
+	@Override
 	public String getAccessToken(String code) {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", "authorization_code");
@@ -51,12 +56,20 @@ public class KakaoAuthClient {
 		return response.getAccessToken();
 	}
 
-	public KakaoUserInfoResponse getUserInfo(String accessToken) {
-		return webClient.get()
+	@Override
+	public OAuthUserInfo getUserInfo(String accessToken) {
+		KakaoUserInfoResponse response = webClient.get()
 			.uri("https://kapi.kakao.com/v2/user/me")
 			.header("Authorization", "Bearer " + accessToken)
 			.retrieve()
 			.bodyToMono(KakaoUserInfoResponse.class)
 			.block();
+
+		return new KakaoUserInfo(response);
+	}
+
+	@Override
+	public OAuthProvider getProvider() {
+		return OAuthProvider.KAKAO;
 	}
 }

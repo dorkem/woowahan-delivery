@@ -1,20 +1,22 @@
 package com.dorkem.food.user.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.common.jwt.JwtProvider;
+import com.dorkem.food.oauth.entity.client.OAuthClient;
+import com.dorkem.food.oauth.entity.info.OAuthUserInfo;
 import com.dorkem.food.user.dto.request.LoginRequest;
 import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
-import com.dorkem.food.user.dto.response.KakaoUserInfoResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.User;
-import com.dorkem.food.user.entity.auth.KakaoAuthClient;
 import com.dorkem.food.user.entity.auth.RefreshToken;
 import com.dorkem.food.user.repository.CustomerRepository;
 import com.dorkem.food.user.repository.RefreshTokenRepository;
@@ -30,14 +32,14 @@ public class UserService {
 	private final CustomerRepository customerRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final JwtProvider jwtProvider;
-	private final KakaoAuthClient kakaoAuthClient;
+	private final List<OAuthClient> oAuthClients;
 
 	@Transactional
 	public Long signup(SignupRequest request) {
 		User user = User.createUser(
-			request.loginType(),
 			request.email(),
 			request.username(),
+			request.userAccount(),
 			request.password(),
 			request.phoneNumber()
 		);
@@ -56,15 +58,28 @@ public class UserService {
 		return issueTokens(user);
 	}
 
-	public String getKakaoLoginUrl() {
-		return kakaoAuthClient.getLoginUrl();
-	}
-
 	@Transactional
-	public LoginResponse kakaoLogin(String code) {
-		String kakaoAccessToken = kakaoAuthClient.getAccessToken(code);
-		KakaoUserInfoResponse kakaoInfo = kakaoAuthClient.getUserInfo(kakaoAccessToken);
-		User user = createKakaoUser(kakaoInfo);
+	public LoginResponse oAuthLogin(String provider, String code) {
+		OAuthClient client = getClient(provider);
+		String accessToken = client.getAccessToken(code);
+		OAuthUserInfo userInfo = client.getUserInfo(accessToken);
+
+		User user = userRepository.findByProviderAndProviderId(
+			userInfo.getProvider(),
+			userInfo.getProviderId()
+			)
+			.orElseGet(() -> {
+				User newUser = userRepository.save(
+					User.createOAuthUser(
+						userInfo.getEmail(),
+						userInfo.getUsername(),
+						userInfo.getProvider(),
+						userInfo.getProviderId()
+					)
+				);
+				customerRepository.save(Customer.createCustomer(newUser));
+				return newUser;
+			});
 		return issueTokens(user);
 	}
 
@@ -98,20 +113,11 @@ public class UserService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 	}
 
-	private User createKakaoUser(KakaoUserInfoResponse kakaoInfo) {
-		return userRepository.findByKakaoId(kakaoInfo.getKakaoId())
-			.orElseGet(() -> registKakaoUser(kakaoInfo));
-	}
-
-	private User registKakaoUser(KakaoUserInfoResponse kakaoInfo) {
-		User newUser = User.createKakaoUser(
-			kakaoInfo.getKakaoId(),
-			kakaoInfo.getNickname(),
-			kakaoInfo.getEmail()
-		);
-		userRepository.save(newUser);
-		customerRepository.save(Customer.createCustomer(newUser));
-		return newUser;
+	private OAuthClient getClient(String provider) {
+		return oAuthClients.stream()
+			.filter(client -> client.getProvider().name().equalsIgnoreCase(provider))
+			.findFirst()
+			.orElseThrow(() -> new CommonException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER));
 	}
 
 	private LoginResponse issueTokens(User user) {
@@ -144,5 +150,9 @@ public class UserService {
 		if (!savedToken.getToken().equals(oldRefreshToken)) {
 			throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
 		}
+	}
+
+	public String getLoginUrl(String provider) {
+		return getClient(provider).getLoginUrl();
 	}
 }
