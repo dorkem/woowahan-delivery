@@ -30,9 +30,10 @@ public class User {
 	@Column(name = "user_id")
 	private Long userId;
 
+	@Getter
 	@Enumerated(EnumType.STRING)
-	@Column(name = "login_type", nullable = false)
-	private LoginType loginType;
+	@Column(name = "role", nullable = false)
+	private UserRole role;
 
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
@@ -42,8 +43,8 @@ public class User {
 	private String username;
 
 	@Getter
-	@Column(name = "kakao_id", unique = true)
-	private Long kakaoId;
+	@Column(name = "user_account")
+	private String userAccount;
 
 	@Column(name = "password")
 	private String password;
@@ -52,34 +53,41 @@ public class User {
 	@Column(name = "phone_number", unique = true)
 	private String phoneNumber;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider")
+	private OAuthProvider provider;
+
+	@Column(name = "provider_id")
+	private String providerId;
+
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	private User(LoginType loginType, String email, String username,
-		String password, String phoneNumber
-	) {
-		this.loginType = loginType;
+	private User(String email, String username, OAuthProvider provider, String providerId) {
 		this.email = email;
 		this.username = username;
+		this.provider = provider;
+		this.providerId = providerId;
+		this.role = UserRole.CUSTOMER;
+	}
+
+	private User(String email, String username, String userAccount, String password, String phoneNumber) {
+		this.email = email;
+		this.username = username;
+		this.userAccount = userAccount;
 		this.password = password;
 		this.phoneNumber = phoneNumber;
+		this.role = UserRole.CUSTOMER;
 	}
 
-	private User(Long kakaoId, String username, String email) {
-		this.kakaoId = kakaoId;
-		this.username = username;
-		this.email = email;
-		this.loginType = LoginType.KAKAO;
+	public static User createUser(String email, String username, String userAccount, String password,
+		String phoneNumber) {
+		return new User(email, username, userAccount, password, phoneNumber);
 	}
 
-	public static User createUser(LoginType loginType, String email,
-		String username, String password, String phoneNumber) {
-		return new User(loginType, email, username, password, phoneNumber);
-	}
-
-	public static User createKakaoUser(Long kakaoId, String username, String email) {
-		return new User(kakaoId, username, email);
+	public static User createOAuthUser(String email, String username, OAuthProvider provider, String providerId) {
+		return new User(email, username, provider, providerId);
 	}
 
 	public boolean matchPassword(String inputPassword) {
