@@ -23,13 +23,17 @@ public class CartService {
 	private final CustomerRepository customerRepository;
 
 	@Transactional
-	public CartResponse getCart(Long customerId) {
-		Cart cart = cartQueryRepository.getCustomerCart(customerId)
-			.orElseGet(() -> {
-				Customer customer = customerRepository.findById(customerId)
-					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
-				return cartRepository.save(Cart.createCart(customer));
-			});
+	public CartResponse getCart(Long userId) {
+		Customer customer = getCustomer(userId);
+
+		Cart cart = cartQueryRepository.getCustomerCart(customer.getCustomerId())
+			.orElseGet(() -> cartRepository.save(Cart.createCart(customer)));
+
 		return CartResponse.createCartResponse(cart);
+	}
+
+	private Customer getCustomer(Long userId) {
+		return customerRepository.findByUser_UserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 }

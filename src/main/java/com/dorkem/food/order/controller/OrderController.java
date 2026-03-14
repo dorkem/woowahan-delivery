@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dorkem.food.common.annotation.AuthUserId;
 import com.dorkem.food.common.response.ResponseDto;
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
@@ -32,33 +33,33 @@ public class OrderController {
 
 	@PostMapping("/order-create")
 	public ResponseEntity<ResponseDto<Map<String, String>>> createOrder(
+		@AuthUserId Long userId,
 		@RequestBody OrderCreateRequest request
 	) {
-		Long userId = 1L; // 나중에 로그인 정보에서 추출
 		String orderId = orderService.createOrder(userId, request);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(ResponseDto.created(Map.of("orderId", orderId)));
 	}
 
-	@GetMapping("users/{userId}/current")
+	@GetMapping("/current")
 	public ResponseEntity<ResponseDto<OrderResponse>> getCurrentUserOrders(
-		@PathVariable Long userId
+		@AuthUserId Long userId
 	) {
 		return ResponseEntity.ok(ResponseDto.ok(orderService.getCurrentUserOrders(userId)));
 	}
 
 	@GetMapping("/{orderId}")
 	public ResponseEntity<ResponseDto<HistoryDetailResponse>> getOrderDetail(
-		@RequestParam Long userId,
+		@AuthUserId Long userId,
 		@PathVariable String orderId
 	) {
 		return ResponseEntity.ok(ResponseDto.ok(orderService.getOrderDetail(userId, orderId)));
 	}
 
-	@GetMapping("/users/{userId}/history")
+	@GetMapping("/history")
 	public ResponseEntity<ResponseDto<OrderHistoryPageResponse>> getOrderHistory(
-		@PathVariable Long userId,
+		@AuthUserId Long userId,
 		@RequestParam(required = false) String cursor,
 		@RequestParam(defaultValue = "5") int size
 	) {
@@ -67,7 +68,7 @@ public class OrderController {
 
 	@DeleteMapping("/{orderId}")
 	public ResponseEntity<ResponseDto<Void>> deleteOrderHistory(
-		@RequestParam Long userId,
+		@AuthUserId Long userId,
 		@PathVariable String orderId
 	) {
 		orderService.deleteOrderHistory(userId, orderId);
@@ -76,6 +77,7 @@ public class OrderController {
 
 	@PatchMapping("/{orderId}/cancel")
 	public ResponseEntity<ResponseDto<Void>> cancelOrder(
+		@AuthUserId Long userId,
 		@PathVariable String orderId
 	) {
 		orderService.cancelOrder(orderId);

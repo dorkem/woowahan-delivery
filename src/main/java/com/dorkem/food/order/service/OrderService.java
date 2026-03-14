@@ -193,7 +193,7 @@ public class OrderService {
 	}
 
 	private Customer getCustomer(Long userId) {
-		return customerRepository.findById(userId)
+		return customerRepository.findByUser_UserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 
