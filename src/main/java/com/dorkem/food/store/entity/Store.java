@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.dorkem.food.category.entity.Category;
@@ -108,6 +109,10 @@ public class Store {
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
+
+	@LastModifiedDate
+	@Column(name = "modified_at", nullable = false)
+	private LocalDateTime modifiedAt;
 
 	private Store(Owner owner, Category category, String thumbnail, String storeName, String businessNumber,
 		String storeAddress, String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,

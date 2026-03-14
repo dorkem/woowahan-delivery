@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.CascadeType;
@@ -45,6 +46,10 @@ public class Customer {
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+
+	@LastModifiedDate
+	@Column(name = "modified_at", nullable = false)
+	private LocalDateTime modifiedAt;
 
 	private Customer(User user) {
 		this.user = user;
