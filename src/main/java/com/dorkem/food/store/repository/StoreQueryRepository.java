@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.dorkem.food.store.entity.Store;
-import com.querydsl.core.QueryFactory;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,14 @@ public class StoreQueryRepository {
 			.selectFrom(store)
 			.where(
 				store.category.categoryId.eq(categoryId),
-				cursor != null ? store.storeId.lt(cursor) : null
+				ltCursor(cursor)
 			)
 			.orderBy(store.storeId.desc())
 			.limit(limit)
 			.fetch();
+	}
+
+	private BooleanExpression ltCursor(Long cursor) {
+		return cursor != null ? store.storeId.lt(cursor) : null;
 	}
 }
