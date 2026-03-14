@@ -26,11 +26,20 @@ public class KakaoAuthClient implements OAuthClient {
 	@Value("${kakao.client-secret}")
 	private String clientSecret;
 
+	@Value("${kakao.authorization-uri}")
+	private String authorizationUri;
+
+	@Value("${kakao.token-uri}")
+	private String tokenUri;
+
+	@Value("${kakao.user-info-uri}")
+	private String userInfoUri;
+
 	private final WebClient webClient = WebClient.create();
 
 	@Override
 	public String getLoginUrl() {
-		return "https://kauth.kakao.com/oauth/authorize"
+		return authorizationUri
 			+ "?client_id=" + clientId
 			+ "&redirect_uri=" + redirectUri
 			+ "&response_type=code";
@@ -46,7 +55,7 @@ public class KakaoAuthClient implements OAuthClient {
 		params.add("code", code);
 
 		KakaoTokenResponse response = webClient.post()
-			.uri("https://kauth.kakao.com/oauth/token")
+			.uri(tokenUri)
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.body(BodyInserters.fromFormData(params))
 			.retrieve()
@@ -59,7 +68,7 @@ public class KakaoAuthClient implements OAuthClient {
 	@Override
 	public OAuthUserInfo getUserInfo(String accessToken) {
 		KakaoUserInfoResponse response = webClient.get()
-			.uri("https://kapi.kakao.com/v2/user/me")
+			.uri(userInfoUri)
 			.header("Authorization", "Bearer " + accessToken)
 			.retrieve()
 			.bodyToMono(KakaoUserInfoResponse.class)
