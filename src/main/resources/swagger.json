@@ -1,0 +1,1262 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/users/logout": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/auth/signup": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/auth/refresh": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoAccessTokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/order-create": {
+      "post": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoMapStringString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stores/{storeId}/orders/{orderId}/reject": {
+      "patch": {
+        "tags": [
+          "store-controller"
+        ],
+        "operationId": "rejectOrder",
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stores/{storeId}/orders/{orderId}/cooking": {
+      "patch": {
+        "tags": [
+          "store-controller"
+        ],
+        "operationId": "startCooking",
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stores/{storeId}/orders/{orderId}/cook-complete": {
+      "patch": {
+        "tags": [
+          "store-controller"
+        ],
+        "operationId": "completeCooking",
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stores/{storeId}/orders/{orderId}/accept": {
+      "patch": {
+        "tags": [
+          "store-controller"
+        ],
+        "operationId": "acceptOrder",
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/{orderId}/request": {
+      "patch": {
+        "tags": [
+          "payment-controller"
+        ],
+        "operationId": "requestPayment",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{orderId}/cancel": {
+      "patch": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/deliveries/{orderId}/start": {
+      "patch": {
+        "tags": [
+          "delivery-controller"
+        ],
+        "operationId": "startDelivery",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/deliveries/{orderId}/complete": {
+      "patch": {
+        "tags": [
+          "delivery-controller"
+        ],
+        "operationId": "completeDelivery",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/users/oauth/{provider}/login": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getOAuthToken",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/oauth/{provider}/callback": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "oAuthLogin",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stores": {
+      "get": {
+        "tags": [
+          "store-controller"
+        ],
+        "operationId": "getStores",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 15
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoStorePageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stores/{storeId}/menus": {
+      "get": {
+        "tags": [
+          "store-controller"
+        ],
+        "operationId": "getMenus",
+        "parameters": [
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoMenuListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "getOrderDetail",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoHistoryDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "deleteOrderHistory",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/users/{userId}/history": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "getOrderHistory",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoOrderHistoryPageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/users/{userId}/current": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "getCurrentUserOrders",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/oauth/{provider}/login": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "getLoginUrl",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoString"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResponseDtoVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "SignupRequest": {
+        "type": "object",
+        "description": "회원가입 요청",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "이메일"
+          },
+          "userAccount": {
+            "type": "string",
+            "description": "유저아이디"
+          },
+          "password": {
+            "type": "string",
+            "description": "비밀번호"
+          },
+          "username": {
+            "type": "string",
+            "description": "닉네임"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "전화번호"
+          }
+        }
+      },
+      "ResponseDtoLong": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "description": "액세스 토큰 재발급 요청",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "기존에 발급받은 리프레시 토큰"
+          }
+        }
+      },
+      "AccessTokenResponse": {
+        "type": "object",
+        "description": "새로운 액세스 토큰 응답",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "새로 발급된 액세스 토큰",
+            "example": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIi..."
+          }
+        }
+      },
+      "ResponseDtoAccessTokenResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AccessTokenResponse"
+          }
+        }
+      },
+      "DeliveryAddressRequest": {
+        "type": "object",
+        "description": "사용자 주소 상세 정보 요청",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "기본 주소"
+          },
+          "addressDetail": {
+            "type": "string",
+            "description": "상세 주소"
+          },
+          "requestToRider": {
+            "type": "string",
+            "description": "라이더 요청 사항"
+          },
+          "entranceAccessPassword": {
+            "type": "string",
+            "description": "공동현관 출입번호"
+          },
+          "deliveryDirections": {
+            "type": "string",
+            "description": "찾아오는 길 안내"
+          }
+        }
+      },
+      "OrderCreateItemRequest": {
+        "type": "object",
+        "description": "주문한 메뉴 요청 정보",
+        "properties": {
+          "menuId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "메뉴 ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "주문 수량"
+          }
+        }
+      },
+      "OrderCreateRequest": {
+        "type": "object",
+        "description": "주문 생성 요청 정보",
+        "properties": {
+          "storeId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "가게 ID"
+          },
+          "items": {
+            "type": "array",
+            "description": "주문한 음식 목록",
+            "items": {
+              "$ref": "#/components/schemas/OrderCreateItemRequest"
+            }
+          },
+          "deliveryAddressRequest": {
+            "$ref": "#/components/schemas/DeliveryAddressRequest",
+            "description": "사용자 배달 주소 정보"
+          },
+          "requestToStore": {
+            "type": "string",
+            "description": "가게 요청사항"
+          },
+          "noCutlery": {
+            "type": "boolean",
+            "description": "수저, 포크 안받기"
+          },
+          "noSideDish": {
+            "type": "boolean",
+            "description": "기본 반찬 안받기"
+          }
+        }
+      },
+      "ResponseDtoMapStringString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ResponseDtoString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "ResponseDtoStorePageResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StorePageResponse"
+          }
+        }
+      },
+      "StorePageResponse": {
+        "type": "object",
+        "properties": {
+          "stores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StoreSummaryResponse"
+            }
+          },
+          "nextCursor": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StoreSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "storeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnail": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string"
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "reviewCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minOrderAmount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "MenuListResponse": {
+        "type": "object",
+        "properties": {
+          "menus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuResponse"
+            }
+          }
+        }
+      },
+      "MenuResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "menuName": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ResponseDtoMenuListResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/MenuListResponse"
+          }
+        }
+      },
+      "HistoryDetailResponse": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "addressDetail": {
+            "type": "string"
+          },
+          "requestToRider": {
+            "type": "string"
+          },
+          "requestToStore": {
+            "type": "string"
+          },
+          "noCutlery": {
+            "type": "boolean"
+          },
+          "noSideDish": {
+            "type": "boolean"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "orderItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemResponse"
+            }
+          },
+          "totalPrice": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderItemResponse": {
+        "type": "object",
+        "properties": {
+          "menuName": {
+            "type": "string"
+          },
+          "orderPrice": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPrice": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ResponseDtoHistoryDetailResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/HistoryDetailResponse"
+          }
+        }
+      },
+      "HistoryResponse": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string"
+          },
+          "orderedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "menuNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "totalPrice": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "OrderHistoryPageResponse": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryResponse"
+            }
+          },
+          "nextCursor": {
+            "type": "string"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ResponseDtoOrderHistoryPageResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OrderHistoryPageResponse"
+          }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string"
+          },
+          "displayStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "COOKING",
+              "DELIVERING",
+              "DELIVERED",
+              "CANCELLED"
+            ]
+          },
+          "address": {
+            "type": "string"
+          },
+          "addressDetail": {
+            "type": "string"
+          },
+          "requestToRider": {
+            "type": "string"
+          },
+          "requestToStore": {
+            "type": "string"
+          },
+          "noCutlery": {
+            "type": "boolean"
+          },
+          "noSideDish": {
+            "type": "boolean"
+          },
+          "orderItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemResponse"
+            }
+          },
+          "totalPrice": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ResponseDtoOrderResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OrderResponse"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "name": "Authorization",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
