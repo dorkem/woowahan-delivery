@@ -27,6 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private static final List<String> WHITE_LIST = List.of(
 		"/api/v1/users/auth/signup",
+		"/api/v1/users/auth/login",
 		"/api/v1/users/auth/refresh",
 		"/api/v1/users/oauth",
 		"/api/v1/oauth",

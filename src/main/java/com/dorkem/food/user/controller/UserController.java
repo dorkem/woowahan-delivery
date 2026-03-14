@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dorkem.food.common.response.ResponseDto;
+import com.dorkem.food.user.dto.request.LoginRequest;
 import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
@@ -35,6 +36,13 @@ public class UserController {
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(ResponseDto.created(userId));
+	}
+
+	@PostMapping("/auth/login")
+	public ResponseEntity<ResponseDto<LoginResponse>> login(
+		@RequestBody LoginRequest request
+	) {
+		return ResponseEntity.ok(ResponseDto.ok(userService.login(request)));
 	}
 
 	@GetMapping("/oauth/{provider}/login")
