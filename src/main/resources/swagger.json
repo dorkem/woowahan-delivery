@@ -96,12 +96,53 @@
         }
       }
     },
+    "/api/v1/users/auth/login": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoLoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/orders/order-create": {
       "post": {
         "tags": [
           "order-controller"
         ],
         "operationId": "createOrder",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -119,6 +160,47 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ResponseDtoMapStringString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cart/items": {
+      "post": {
+        "tags": [
+          "cart-controller"
+        ],
+        "operationId": "addItem",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCartItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoCartResponse"
                 }
               }
             }
@@ -320,6 +402,15 @@
         "operationId": "cancelOrder",
         "parameters": [
           {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
             "name": "orderId",
             "in": "path",
             "required": true,
@@ -384,6 +475,94 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/cart/items/{cartItemId}": {
+      "delete": {
+        "tags": [
+          "cart-controller"
+        ],
+        "operationId": "deleteItem",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cartItemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoCartResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "cart-controller"
+        ],
+        "operationId": "updateItem",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cartItemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCartItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDtoCartResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -466,7 +645,7 @@
           {
             "name": "categoryId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -613,7 +792,7 @@
         }
       }
     },
-    "/api/v1/orders/users/{userId}/history": {
+    "/api/v1/orders/history": {
       "get": {
         "tags": [
           "order-controller"
@@ -622,7 +801,7 @@
         "parameters": [
           {
             "name": "userId",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "integer",
@@ -662,7 +841,7 @@
         }
       }
     },
-    "/api/v1/orders/users/{userId}/current": {
+    "/api/v1/orders/current": {
       "get": {
         "tags": [
           "order-controller"
@@ -671,7 +850,7 @@
         "parameters": [
           {
             "name": "userId",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "integer",
@@ -693,19 +872,20 @@
         }
       }
     },
-    "/api/v1/oauth/{provider}/login": {
+    "/api/v1/cart": {
       "get": {
         "tags": [
-          "auth-controller"
+          "cart-controller"
         ],
-        "operationId": "getLoginUrl",
+        "operationId": "getCart",
         "parameters": [
           {
-            "name": "provider",
-            "in": "path",
+            "name": "userId",
+            "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],
@@ -715,7 +895,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResponseDtoString"
+                  "$ref": "#/components/schemas/ResponseDtoCartResponse"
                 }
               }
             }
@@ -819,6 +999,46 @@
           }
         }
       },
+      "LoginRequest": {
+        "type": "object",
+        "description": "로그인 요청",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "이메일"
+          },
+          "password": {
+            "type": "string",
+            "description": "비밀번호"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "ResponseDtoLoginResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginResponse"
+          }
+        }
+      },
       "DeliveryAddressRequest": {
         "type": "object",
         "description": "사용자 주소 상세 정보 요청",
@@ -913,6 +1133,102 @@
           }
         }
       },
+      "AddCartItemRequest": {
+        "type": "object",
+        "description": "장바구니 메뉴 추가 요청",
+        "properties": {
+          "menuId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "메뉴 ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "수량"
+          }
+        }
+      },
+      "CartItemResponse": {
+        "type": "object",
+        "properties": {
+          "cartItemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "menuId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "menuName": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subtotal": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CartResponse": {
+        "type": "object",
+        "properties": {
+          "cartId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "storeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "storeName": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItemResponse"
+            }
+          },
+          "totalPrice": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ResponseDtoCartResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CartResponse"
+          }
+        }
+      },
+      "UpdateCartItemRequest": {
+        "type": "object",
+        "description": "장바구니 메뉴 수량 변경 요청",
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "변경할 수량 (양수면 증가, 음수면 감소)"
+          }
+        }
+      },
       "ResponseDtoString": {
         "type": "object",
         "properties": {
@@ -924,17 +1240,6 @@
             "type": "string"
           },
           "data": {
-            "type": "string"
-          }
-        }
-      },
-      "LoginResponse": {
-        "type": "object",
-        "properties": {
-          "accessToken": {
-            "type": "string"
-          },
-          "refreshToken": {
             "type": "string"
           }
         }
