@@ -20,6 +20,8 @@ public enum ErrorCode {
 	NOT_FOUND_STORE(40404, HttpStatus.NOT_FOUND, "해당 가게를 찾을 수 없습니다."),
 	NOT_FOUND_MENU(40405, HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
 	NOT_FOUND_ORDER(40406, HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	NOT_FOUND_CART(40407, HttpStatus.NOT_FOUND, "해당 장바구니를 찾을 수 없습니다."),
+	NOT_FOUND_CART_ITEM(40408, HttpStatus.NOT_FOUND, "해당 장바구니 메뉴를 찾을 수 없습니다."),
 	NOT_FOUND_CURRENT_ORDER(40407, HttpStatus.NOT_FOUND, "현재 진행 중인 주문이 없습니다."),
 	NOT_FOUND_ORDER_HISTORY(40408, HttpStatus.NOT_FOUND, "주문 내역을 찾을 수 없습니다."),
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러입니다.");

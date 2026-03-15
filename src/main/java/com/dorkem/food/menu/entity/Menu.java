@@ -33,6 +33,7 @@ public class Menu {
 	@Column(name = "menu_id")
 	private Long menuId;
 
+	@Getter
 	@ManyToOne
 	private Store store;
 
