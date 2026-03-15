@@ -9,6 +9,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.dorkem.food.common.annotation.AuthUserId;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Component
 public class ArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -25,6 +27,7 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
 		NativeWebRequest webRequest,
 		WebDataBinderFactory binderFactory) throws Exception {
 
-		return null;
+		HttpServletRequest request = (HttpServletRequest)webRequest.getNativeRequest();
+		return request.getAttribute("userId");
 	}
 }
