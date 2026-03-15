@@ -21,7 +21,7 @@ public class StoreService {
 	private final OrderService orderService;
 
 	@Transactional
-	public StorePageResponse getStores(int categoryId, Long cursor, int size) {
+	public StorePageResponse getStores(Integer categoryId, Long cursor, int size) {
 		List<Store> stores = storeQueryRepository.findStoresByCategory(categoryId, cursor, size + 1);
 
 		boolean hasNext = stores.size() > size;

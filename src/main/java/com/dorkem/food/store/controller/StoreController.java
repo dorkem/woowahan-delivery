@@ -26,7 +26,7 @@ public class StoreController {
 
 	@GetMapping
 	public ResponseEntity<ResponseDto<StorePageResponse>> getStores(
-		@RequestParam int categoryId,
+		@RequestParam(required = false) Integer categoryId,
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(defaultValue = "15") int size
 	) {

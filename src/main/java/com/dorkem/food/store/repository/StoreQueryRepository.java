@@ -18,16 +18,20 @@ public class StoreQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public List<Store> findStoresByCategory(int categoryId, Long cursor, int limit) {
+	public List<Store> findStoresByCategory(Integer categoryId, Long cursor, int limit) {
 		return queryFactory
 			.selectFrom(store)
 			.where(
-				store.category.categoryId.eq(categoryId),
+				eqCategory(categoryId),
 				ltCursor(cursor)
 			)
 			.orderBy(store.storeId.desc())
 			.limit(limit)
 			.fetch();
+	}
+
+	private BooleanExpression eqCategory(Integer categoryId) {
+		return categoryId != null ? store.category.categoryId.eq(categoryId) : null;
 	}
 
 	private BooleanExpression ltCursor(Long cursor) {
