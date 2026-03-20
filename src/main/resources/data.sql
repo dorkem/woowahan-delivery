@@ -207,8 +207,8 @@ VALUES (58, 20, '모둠보쌈(소)', '다양한 김치와 함께 즐기는 보�
        (59, 20, '매운火보쌈', '화끈하게 매운 보쌈', 35000, NOW(), NOW()),
        (60, 20, '새싹쟁반무침면', '신선한 새싹채소가 들어간 비빔면', 11000, NOW(), NOW());
 
--- PK 시퀀스
-ALTER TABLE users ALTER COLUMN user_id RESTART WITH 3;
-ALTER TABLE stores ALTER COLUMN store_id RESTART WITH 11;
-ALTER TABLE menus ALTER COLUMN menu_id RESTART WITH 7;
-ALTER TABLE reviews ALTER COLUMN review_id RESTART WITH 3;
+-- -- PK 시퀀스
+-- ALTER TABLE users ALTER COLUMN user_id RESTART WITH 3;
+-- ALTER TABLE stores ALTER COLUMN store_id RESTART WITH 11;
+-- ALTER TABLE menus ALTER COLUMN menu_id RESTART WITH 7;
+-- ALTER TABLE reviews ALTER COLUMN review_id RESTART WITH 3;
