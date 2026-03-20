@@ -2,7 +2,7 @@ name: Deploy to Review Branch
 
 on:
   push:
-    branches: [ "review" ]
+    branches: [ "feature/step2" ]
 
 jobs:
   build-and-deploy:
