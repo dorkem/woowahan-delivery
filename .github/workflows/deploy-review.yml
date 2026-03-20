@@ -39,7 +39,7 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           source: "build/libs/*.jar,frontend/dist/**"
           target: "/home/ec2-user/woowahan-delivery"
-          strip_components: 2
+          strip_components: 1
 
       - name: Execute Deployment Script
         uses: appleboy/ssh-action@v1
@@ -49,6 +49,5 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             cd /home/ec2-user/woowahan-delivery
-            # 💡 +x 로 수정했습니다.
             chmod +x deploy.sh
             ./deploy.sh ${{ secrets.SERVER_HOST }}
