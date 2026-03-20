@@ -31,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/api/v1/users/auth/refresh",
 		"/api/v1/users/oauth",
 		"/api/v1/oauth",
+		"/oauth/kakao",
 		"/v3/api-docs",
 		"/swagger-ui",
 		"/h2-console"
