@@ -27,6 +27,7 @@ import com.dorkem.food.order.repository.OrderRepository;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.repository.StoreRepository;
 import com.dorkem.food.user.entity.Customer;
+import com.dorkem.food.user.repository.CustomerQueryRepository;
 import com.dorkem.food.user.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final OrderQueryRepository orderQueryRepository;
 	private final StoreRepository storeRepository;
-	private final CustomerRepository customerRepository;
+	private final CustomerQueryRepository customerQueryRepository;
 	private final MenuRepository menuRepository;
 
 	@Transactional
@@ -193,7 +194,7 @@ public class OrderService {
 	}
 
 	private Customer getCustomer(Long userId) {
-		return customerRepository.findByUser_UserId(userId)
+		return customerQueryRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 

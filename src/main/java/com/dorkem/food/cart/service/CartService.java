@@ -16,6 +16,7 @@ import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.menu.repository.MenuRepository;
 import com.dorkem.food.user.entity.Customer;
+import com.dorkem.food.user.repository.CustomerQueryRepository;
 import com.dorkem.food.user.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class CartService {
 	private final CartRepository cartRepository;
 	private final CartItemRepository cartItemRepository;
 	private final CartQueryRepository cartQueryRepository;
-	private final CustomerRepository customerRepository;
+	private final CustomerQueryRepository customerQueryRepository;
 	private final MenuRepository menuRepository;
 
 	@Transactional
@@ -82,7 +83,7 @@ public class CartService {
 	}
 
 	private Customer getCustomer(Long userId) {
-		return customerRepository.findByUser_UserId(userId)
+		return customerQueryRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 
