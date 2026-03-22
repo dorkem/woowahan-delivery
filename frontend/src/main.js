@@ -34,10 +34,10 @@ function renderApp() {
         </div>
       `;
       api.kakaoCallback(code).then(() => {
-        window.location.href = '/';
+        window.location.replace('/');
       }).catch(err => {
         alert('Kakao Login Failed: ' + err.message);
-        window.location.href = '/';
+        window.location.replace('/');
       });
       return;
     }
@@ -61,24 +61,23 @@ function renderApp() {
   app.appendChild(main)
   app.appendChild(createFooter())
 
-  // Initial Route
-  if (!api.isAuthenticated()) {
-    main.innerHTML = `
-      <div style="padding: 100px 20px; text-align: center; height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h2 style="font-size: 2rem; margin-bottom: 20px; color: var(--text-main);">Welcome to Woowahan Delivery</h2>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Please log in to browse delicious stores and order food.</p>
-        <p class="text-sm text-muted">Use <strong>owner1@test.com</strong> / <strong>pass123</strong> to test</p>
-      </div>
-    `;
-  } else {
-    renderHome(main);
-  }
-
   // Attach Router Listener
   document.addEventListener('navigate', (e) => {
-    const { page, id } = e.detail;
+    const { page, id, isPopState, replace } = e.detail;
     main.innerHTML = ''; // clear DOM
     window.scrollTo(0, 0); // scroll to top
+    
+    if (!isPopState) {
+      let url = '/';
+      if (page !== 'home' && page !== 'landing') {
+        url = `/?page=${page}${id ? `&id=${id}` : ''}`;
+      }
+      if (replace) {
+        history.replaceState({ page, id }, '', url);
+      } else {
+        history.pushState({ page, id }, '', url);
+      }
+    }
     
     if (page === 'home') {
       renderHome(main);
@@ -88,8 +87,41 @@ function renderApp() {
       renderCheckout(main);
     } else if (page === 'tracker') {
       renderOrderTracker(main, id);
+    } else if (page === 'landing') {
+      main.innerHTML = `
+        <div style="padding: 100px 20px; text-align: center; height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <h2 style="font-size: 2rem; margin-bottom: 20px; color: var(--text-main);">Welcome to Woowahan Delivery</h2>
+          <p style="color: var(--text-muted); margin-bottom: 30px;">Please log in to browse delicious stores and order food.</p>
+        </div>
+      `;
     }
   });
+
+  window.addEventListener('popstate', (e) => {
+    if (e.state) {
+      document.dispatchEvent(new CustomEvent('navigate', { 
+        detail: { page: e.state.page, id: e.state.id, isPopState: true } 
+      }));
+    } else {
+      document.dispatchEvent(new CustomEvent('navigate', { 
+        detail: { page: 'landing', isPopState: true } 
+      }));
+    }
+  });
+
+  // Initial Route
+  if (!api.isAuthenticated()) {
+    document.dispatchEvent(new CustomEvent('navigate', { 
+      detail: { page: 'landing', isPopState: false, replace: true } 
+    }));
+  } else {
+    const params = new URLSearchParams(window.location.search);
+    const initialPage = params.get('page') || 'home';
+    const initialId = params.get('id');
+    document.dispatchEvent(new CustomEvent('navigate', { 
+      detail: { page: initialPage, id: initialId, isPopState: false, replace: true } 
+    }));
+  }
 
   // Logo navigation
   const logo = app.querySelector('.header-logo');
@@ -120,4 +152,14 @@ function setupCartToggle() {
 }
 
 // Render app when DOM is ready
-document.addEventListener('DOMContentLoaded', renderApp)
+document.addEventListener('DOMContentLoaded', async () => {
+  if (api.isAuthenticated()) {
+    try {
+      // 앱 초기화 시 토큰 재발급 1회 수행 (401 에러 방지)
+      await api.refreshTokens();
+    } catch(e) {
+      console.error('Initial token refresh failed', e);
+    }
+  }
+  renderApp();
+});

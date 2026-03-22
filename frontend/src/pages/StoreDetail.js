@@ -11,7 +11,7 @@ export async function renderStoreDetail(container, storeId) {
   const storeData = {
     id: storeId,
     name: 'Selected Store',
-    thumbnail: 'https://via.placeholder.com/1200x400/FF5A00/FFFFFF?text=Premium+Cover',
+    thumbnail: '', // 추후 백엔드 연동 시 실제 제공되는 URL 사용
     rating: 4.8,
     reviews: 245,
     minOrder: 15000,
@@ -36,7 +36,11 @@ export async function renderStoreDetail(container, storeId) {
   
   const cover = document.createElement('div');
   cover.className = 'store-cover';
-  cover.style.backgroundImage = `url(${storeData.thumbnail})`;
+  if (storeData.thumbnail) {
+    cover.style.backgroundImage = `url(${storeData.thumbnail})`;
+  } else {
+    cover.style.backgroundColor = '#FF5A00'; // Default brand color or gray
+  }
 
   const infoCard = document.createElement('div');
   infoCard.className = 'store-info-card';
@@ -108,7 +112,6 @@ export async function renderStoreDetail(container, storeId) {
         <span class="menu-price">${menu.price.toLocaleString()}원</span>
       </div>
       <div class="menu-image">
-        <img src="${menu.image}" alt="${menu.menuName}" />
         <button class="menu-add-btn">
           <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-6-6h12"/></svg>
         </button>

@@ -113,9 +113,13 @@ async function renderStoreFeed(categoryId) {
       // Card Thumbnail
       const thumbnail = document.createElement('div');
       thumbnail.className = 'store-thumbnail';
-      // Swagger has a thumbnail field, but some might be null. Fallback.
-      const bgUrl = store.thumbnail || `https://placehold.co/400x200/FF5A00/FFFFFF?text=${encodeURIComponent(store.storeName)}`;
-      thumbnail.style.backgroundImage = `url(${bgUrl})`;
+      // 백엔드에서 제공하는 기본 이미지를 바로 사용합니다.
+      const bgUrl = store.thumbnail;
+      if (bgUrl) {
+        thumbnail.style.backgroundImage = `url(${bgUrl})`;
+      } else {
+        thumbnail.style.backgroundColor = '#EEEEEE';
+      }
       
       if (store.averageRating > 4.7) {
         const bestBadge = document.createElement('div');

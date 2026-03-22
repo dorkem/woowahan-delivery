@@ -1,8 +1,7 @@
-/* Component: Button */
-export function createButton({ text, variant = 'primary', size = 'md', onClick, type = 'button', icon = null }) {
+export function createButton({ text, variant = 'primary', size = 'md', onClick, type = 'button', icon = null, className = '' }) {
   const btn = document.createElement('button');
   btn.type = type;
-  btn.className = `btn btn-${variant} btn-${size}`;
+  btn.className = `btn btn-${variant} btn-${size} ${className}`.trim();
   
   if (icon) {
     const iconSpan = document.createElement('span');
