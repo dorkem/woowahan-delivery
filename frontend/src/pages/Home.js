@@ -114,7 +114,7 @@ async function renderStoreFeed(categoryId) {
       const thumbnail = document.createElement('div');
       thumbnail.className = 'store-thumbnail';
       // Swagger has a thumbnail field, but some might be null. Fallback.
-      const bgUrl = store.thumbnail || `https://via.placeholder.com/400x200/FF5A00/FFFFFF?text=${encodeURIComponent(store.storeName)}`;
+      const bgUrl = store.thumbnail || `https://placehold.co/400x200/FF5A00/FFFFFF?text=${encodeURIComponent(store.storeName)}`;
       thumbnail.style.backgroundImage = `url(${bgUrl})`;
       
       if (store.averageRating > 4.7) {

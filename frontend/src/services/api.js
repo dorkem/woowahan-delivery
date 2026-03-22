@@ -23,7 +23,12 @@ export function createApi() {
     try {
       const response = await fetch(`${BASE_URL}${endpoint}`, config);
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        let errMsg = `API Error: ${response.status}`;
+        try {
+          const errBody = await response.json();
+          if (errBody && errBody.message) errMsg = errBody.message;
+        } catch (e) {}
+        throw new Error(errMsg);
       }
       return await response.json();
     } catch (error) {
@@ -66,6 +71,12 @@ export function createApi() {
     removeCartItem: async (cartItemId) => {
       return fetchApi(`/cart/items/${cartItemId}`, {
         method: 'DELETE'
+      });
+    },
+    signup: async (signupData) => {
+      return fetchApi(`/users/auth/signup`, {
+        method: 'POST',
+        body: JSON.stringify(signupData)
       });
     },
     login: async (email, password) => {

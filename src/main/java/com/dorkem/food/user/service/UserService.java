@@ -36,6 +36,13 @@ public class UserService {
 
 	@Transactional
 	public Long signup(SignupRequest request) {
+		if (userRepository.existsByEmail(request.email())) {
+			throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
+		}
+		if (userRepository.existsByPhoneNumber(request.phoneNumber())) {
+			throw new CommonException(ErrorCode.DUPLICATED_PHONE_NUMBER);
+		}
+
 		User user = User.createUser(
 			request.email(),
 			request.username(),

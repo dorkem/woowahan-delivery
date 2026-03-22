@@ -28,28 +28,111 @@ export function createLoginModal({ onSuccess }) {
     label: 'Email', 
     type: 'email', 
     placeholder: 'owner1@test.com',
-    value: 'owner1@test.com', // Pre-fill for ease of testing
     required: true 
   });
-  
+
+  const userAccountInput = createInput({ 
+    label: 'User ID', 
+    type: 'text', 
+    placeholder: 'user123',
+  });
+  userAccountInput.style.display = 'none';
+
   const passwordInput = createInput({ 
     label: 'Password', 
     type: 'password', 
     placeholder: 'pass123',
-    value: 'pass123', // Pre-fill for ease of testing
     required: true 
   });
+
+  const usernameInput = createInput({ 
+    label: 'Name', 
+    type: 'text', 
+    placeholder: 'John Doe',
+  });
+  usernameInput.style.display = 'none';
+
+  const phoneInput = createInput({ 
+    label: 'Phone Number', 
+    type: 'text', 
+    placeholder: '010-1234-5678',
+  });
+  phoneInput.style.display = 'none';
 
   const errorMsg = document.createElement('div');
   errorMsg.className = 'login-error text-danger text-sm mb-md';
   errorMsg.style.display = 'none';
 
-  const submitBtn = createButton({ text: 'Login', variant: 'primary', size: 'lg', className: 'w-full mt-sm' });
+  const submitBtn = createButton({ text: 'Login', type: 'submit', variant: 'primary', size: 'lg', className: 'w-full mt-sm' });
+
+  // Add toggle mode button
+  const toggleModeContainer = document.createElement('div');
+  toggleModeContainer.style.textAlign = 'center';
+  toggleModeContainer.style.marginTop = '10px';
+  const toggleModeBtn = document.createElement('button');
+  toggleModeBtn.type = 'button';
+  toggleModeBtn.textContent = 'Need an account? Sign up';
+  toggleModeBtn.style.background = 'none';
+  toggleModeBtn.style.border = 'none';
+  toggleModeBtn.style.color = 'var(--primary, #007bff)';
+  toggleModeBtn.style.cursor = 'pointer';
+  toggleModeBtn.style.textDecoration = 'underline';
+  
+  let isSignupMode = false;
+  
+  toggleModeBtn.onclick = () => {
+    isSignupMode = !isSignupMode;
+    errorMsg.style.display = 'none';
+    if(isSignupMode) {
+      userAccountInput.style.display = 'block';
+      userAccountInput.querySelector('input').required = true;
+      usernameInput.style.display = 'block';
+      usernameInput.querySelector('input').required = true;
+      phoneInput.style.display = 'block';
+      phoneInput.querySelector('input').required = true;
+
+      emailInput.querySelector('input').value = '';
+      passwordInput.querySelector('input').value = '';
+      
+      header.innerHTML = `
+        <h2>Create Account</h2>
+        <p class="text-muted">Join us to order your favorite food</p>
+      `;
+      submitBtn.textContent = 'Sign Up';
+      toggleModeBtn.textContent = 'Already have an account? Login';
+      socialDivider.style.display = 'none';
+      kakaoBtn.style.display = 'none';
+    } else {
+      userAccountInput.style.display = 'none';
+      userAccountInput.querySelector('input').required = false;
+      usernameInput.style.display = 'none';
+      usernameInput.querySelector('input').required = false;
+      phoneInput.style.display = 'none';
+      phoneInput.querySelector('input').required = false;
+
+      emailInput.querySelector('input').value = '';
+      passwordInput.querySelector('input').value = '';
+
+      header.innerHTML = `
+        <h2>Welcome Back</h2>
+        <p class="text-muted">Sign in to order your favorite food</p>
+      `;
+      submitBtn.textContent = 'Login';
+      toggleModeBtn.textContent = 'Need an account? Sign up';
+      socialDivider.style.display = 'flex';
+      kakaoBtn.style.display = 'block';
+    }
+  };
+  toggleModeContainer.appendChild(toggleModeBtn);
 
   form.appendChild(emailInput);
+  form.appendChild(userAccountInput);
   form.appendChild(passwordInput);
+  form.appendChild(usernameInput);
+  form.appendChild(phoneInput);
   form.appendChild(errorMsg);
   form.appendChild(submitBtn);
+  form.appendChild(toggleModeContainer);
 
   form.onsubmit = async (e) => {
     e.preventDefault();
@@ -61,15 +144,37 @@ export function createLoginModal({ onSuccess }) {
     const password = passwordInput.querySelector('input').value;
 
     try {
-      await api.login(email, password);
-      overlay.remove();
-      if (onSuccess) onSuccess();
+      if (isSignupMode) {
+        const userAccount = userAccountInput.querySelector('input').value;
+        const username = usernameInput.querySelector('input').value;
+        const phone = phoneInput.querySelector('input').value;
+        
+        await api.signup({
+          email,
+          userAccount,
+          password,
+          username,
+          phoneNumber: phone
+        });
+        
+        // 성공 시 팝업 없이 다시 로그인 모드로 전환
+        toggleModeBtn.click();
+      } else {
+        await api.login(email, password);
+        overlay.remove();
+        if (onSuccess) onSuccess();
+      }
     } catch (err) {
       console.error(err);
-      errorMsg.textContent = 'Invalid email or password.';
+      const msg = err.message && !err.message.startsWith('API Error:') ? err.message : null;
+      if (isSignupMode) {
+        errorMsg.textContent = msg || 'Failed to sign up. Please try again or check your inputs.';
+      } else {
+        errorMsg.textContent = msg || 'Invalid email or password.';
+      }
       errorMsg.style.display = 'block';
     } finally {
-      submitBtn.textContent = 'Login';
+      submitBtn.textContent = isSignupMode ? 'Sign Up' : 'Login';
       submitBtn.disabled = false;
     }
   };
