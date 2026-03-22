@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dorkem.food.common.annotation.AuthUserId;
 import com.dorkem.food.common.response.ResponseDto;
 import com.dorkem.food.user.dto.request.LoginRequest;
 import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
+import com.dorkem.food.user.dto.response.UserProfileResponse;
 import com.dorkem.food.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -72,5 +74,12 @@ public class UserController {
 		Long userId = (Long)request.getAttribute("userId");
 		userService.logout(userId);
 		return ResponseEntity.ok(ResponseDto.ok(null));
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<ResponseDto<UserProfileResponse>> getProfile(
+		@AuthUserId Long userId
+	) {
+		return ResponseEntity.ok(ResponseDto.ok(userService.getProfile(userId)));
 	}
 }

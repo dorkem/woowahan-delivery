@@ -16,6 +16,7 @@ import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
+import com.dorkem.food.user.dto.response.UserProfileResponse;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.User;
 import com.dorkem.food.user.entity.auth.RefreshToken;
@@ -63,7 +64,7 @@ public class UserService {
 
 	@Transactional
 	public LoginResponse login(LoginRequest request) {
-		User user = getUser(request);
+		User user = getUserByEmail(request);
 		matchPassword(request, user);
 		return issueTokens(user);
 	}
@@ -115,13 +116,24 @@ public class UserService {
 		refreshTokenRepository.deleteByUserId(userId);
 	}
 
+	@Transactional(readOnly = true)
+	public UserProfileResponse getProfile(Long userId) {
+		User user = getUser(userId);
+		return UserProfileResponse.getUserInfo(user);
+	}
+
 	private void matchPassword(LoginRequest request, User user) {
 		if (!user.matchPassword(request.password())) {
 			throw new CommonException(ErrorCode.FAILURE_LOGIN);
 		}
 	}
 
-	private User getUser(LoginRequest request) {
+	private User getUser(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+	}
+
+	private User getUserByEmail(LoginRequest request) {
 		return userRepository.findByEmail(request.email())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 	}

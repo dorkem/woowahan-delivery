@@ -35,6 +35,7 @@ public class User {
 	@Column(name = "role", nullable = false)
 	private UserRole role;
 
+	@Getter
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
@@ -102,7 +103,7 @@ public class User {
 		return new User(email, username, provider, providerId);
 	}
 
-	public String getUserRole(){
+	public String getUserRole() {
 		return this.role.name();
 	}
 
