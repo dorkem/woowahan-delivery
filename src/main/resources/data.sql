@@ -21,8 +21,10 @@ INSERT INTO category (category_id, category_name, slug, sort_order)
 VALUES (10, '족발·보쌈', 'pork', 10);
 
 -- 2. 유저 데이터 (modified_at 추가)
-INSERT INTO users (user_id, username, phone_number, email, password, role, created_at, modified_at)
-VALUES (1, '김사장', '010-1111-1111', 'owner1@test.com', 'pass123', 'OWNER', NOW(), NOW());
+INSERT INTO users (user_id, username, phone_number, email, password, role, user_profile, created_at, modified_at)
+VALUES (1, '김사장', '010-1111-1111', 'owner1@test.com', 'pass123', 'OWNER',
+        'https://woowahan-d.s3.ap-northeast-2.amazonaws.com/defaults/default_user.png',
+        NOW(), NOW());
 
 -- 3. 사장님 데이터 (modified_at 추가)
 INSERT INTO owners (user_id, owner_name, business_number, created_at, modified_at)
