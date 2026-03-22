@@ -45,7 +45,7 @@ function renderApp() {
 
   const app = document.querySelector('#app')
   app.className = 'app-container'
-  
+
   // Create Main Content Area
   const main = document.createElement('main')
   main.className = 'main-content'
@@ -53,34 +53,37 @@ function renderApp() {
 
   // Build Shell
   app.appendChild(createHeader())
-  
+
   if (api.isAuthenticated()) {
     app.appendChild(createCartSidebar([]))
   }
-  
+
   app.appendChild(main)
   app.appendChild(createFooter())
 
   // Attach Router Listener
   document.addEventListener('navigate', (e) => {
-    const { page, id, isPopState, replace } = e.detail;
+    const { page, id, categoryId, isPopState, replace } = e.detail;
     main.innerHTML = ''; // clear DOM
     window.scrollTo(0, 0); // scroll to top
-    
+
     if (!isPopState) {
       let url = '/';
+      if (page === 'home' && categoryId && categoryId !== 1 && categoryId !== '1') {
+        url = `/?page=home&categoryId=${categoryId}`;
+      }
       if (page !== 'home' && page !== 'landing') {
         url = `/?page=${page}${id ? `&id=${id}` : ''}`;
       }
       if (replace) {
-        history.replaceState({ page, id }, '', url);
+        history.replaceState({ page, id, categoryId }, '', url);
       } else {
-        history.pushState({ page, id }, '', url);
+        history.pushState({ page, id, categoryId }, '', url);
       }
     }
-    
+
     if (page === 'home') {
-      renderHome(main);
+      renderHome(main, categoryId);
     } else if (page === 'store') {
       renderStoreDetail(main, id);
     } else if (page === 'checkout') {
@@ -99,36 +102,37 @@ function renderApp() {
 
   window.addEventListener('popstate', (e) => {
     if (e.state) {
-      document.dispatchEvent(new CustomEvent('navigate', { 
-        detail: { page: e.state.page, id: e.state.id, isPopState: true } 
+      document.dispatchEvent(new CustomEvent('navigate', {
+        detail: { page: e.state.page, id: e.state.id, categoryId: e.state.categoryId, isPopState: true }
       }));
     } else {
-      document.dispatchEvent(new CustomEvent('navigate', { 
-        detail: { page: 'landing', isPopState: true } 
+      document.dispatchEvent(new CustomEvent('navigate', {
+        detail: { page: 'landing', isPopState: true }
       }));
     }
   });
 
   // Initial Route
   if (!api.isAuthenticated()) {
-    document.dispatchEvent(new CustomEvent('navigate', { 
-      detail: { page: 'landing', isPopState: false, replace: true } 
+    document.dispatchEvent(new CustomEvent('navigate', {
+      detail: { page: 'landing', isPopState: false, replace: true }
     }));
   } else {
     const params = new URLSearchParams(window.location.search);
     const initialPage = params.get('page') || 'home';
     const initialId = params.get('id');
-    document.dispatchEvent(new CustomEvent('navigate', { 
-      detail: { page: initialPage, id: initialId, isPopState: false, replace: true } 
+    const initialCategoryId = params.get('categoryId');
+    document.dispatchEvent(new CustomEvent('navigate', {
+      detail: { page: initialPage, id: initialId, categoryId: initialCategoryId, isPopState: false, replace: true }
     }));
   }
 
   // Logo navigation
   const logo = app.querySelector('.header-logo');
-  if(logo) {
+  if (logo) {
     logo.addEventListener('click', (e) => {
       e.preventDefault();
-      document.dispatchEvent(new CustomEvent('navigate', { detail: { page: 'home' }}));
+      document.dispatchEvent(new CustomEvent('navigate', { detail: { page: 'home' } }));
     });
   }
 
@@ -140,7 +144,7 @@ function setupCartToggle() {
   const cartBtn = document.querySelector('.cart-toggle');
   const cartSidebar = document.querySelector('.cart-sidebar');
   const closeBtn = document.querySelector('.cart-close');
-  
+
   if (cartBtn && cartSidebar && closeBtn) {
     cartBtn.addEventListener('click', () => {
       cartSidebar.classList.add('open');
@@ -152,14 +156,6 @@ function setupCartToggle() {
 }
 
 // Render app when DOM is ready
-document.addEventListener('DOMContentLoaded', async () => {
-  if (api.isAuthenticated()) {
-    try {
-      // 앱 초기화 시 토큰 재발급 1회 수행 (401 에러 방지)
-      await api.refreshTokens();
-    } catch(e) {
-      console.error('Initial token refresh failed', e);
-    }
-  }
-  renderApp();
+document.addEventListener('DOMContentLoaded', () => {
+  renderApp(); // 그냥 바로 실행
 });

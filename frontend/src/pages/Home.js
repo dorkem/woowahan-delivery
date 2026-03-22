@@ -2,7 +2,7 @@ import { createChip } from '../components/Chip.js';
 import { createCard } from '../components/Card.js';
 import { api } from '../services/api.js';
 
-export function renderHome(container) {
+export function renderHome(container, initialCategoryId = null) {
   container.innerHTML = '';
   
   // Hero Section
@@ -35,22 +35,18 @@ export function renderHome(container) {
   const chipContainer = document.createElement('div');
   chipContainer.className = 'chip-container';
   
-  let activeCategoryId = 1;
+  let activeCategoryId = parseInt(initialCategoryId) || 1;
 
   categories.forEach(cat => {
     const chip = createChip({
       text: cat.name,
       active: cat.id === activeCategoryId,
-      onClick: (e, isActive) => {
-        if(isActive) return; // Ignore if clicking already active
+      onClick: (e) => {
+        if (cat.id === activeCategoryId) return; // Ignore if clicking already active
         
-        // Reset all chips visual state
-        const allChips = chipContainer.querySelectorAll('.chip');
-        allChips.forEach(c => c.classList.remove('chip-active'));
-        e.target.classList.add('chip-active');
-        
-        activeCategoryId = cat.id;
-        renderStoreFeed(activeCategoryId);
+        document.dispatchEvent(new CustomEvent('navigate', { 
+          detail: { page: 'home', categoryId: cat.id }
+        }));
       }
     });
     chipContainer.appendChild(chip);
