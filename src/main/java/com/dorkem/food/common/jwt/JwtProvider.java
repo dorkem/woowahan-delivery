@@ -21,17 +21,18 @@ public class JwtProvider {
 	@Value("${jwt.refresh-token-expiration}")
 	private long REFRESH_TOKEN_TIME;
 
-	public String createAccessToken(Long userId) {
-		return createToken(String.valueOf(userId), ACCESS_TOKEN_TIME);
+	public String createAccessToken(Long userId, String role) {
+		return createToken(String.valueOf(userId), role, ACCESS_TOKEN_TIME);
 	}
 
-	public String createRefreshToken(Long userId) {
-		return createToken(String.valueOf(userId), REFRESH_TOKEN_TIME);
+	public String createRefreshToken(Long userId, String role) {
+		return createToken(String.valueOf(userId), role, REFRESH_TOKEN_TIME);
 	}
 
-	private String createToken(String userId, long tokenValidTime) {
+	private String createToken(String userId, String role, long tokenValidTime) {
 		return Jwts.builder()
 			.setSubject(userId)
+			.claim("role", role)
 			.setIssuedAt(new Date())
 			.setExpiration(new Date(System.currentTimeMillis() + tokenValidTime))
 			.signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())

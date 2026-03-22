@@ -75,8 +75,8 @@ public class UserService {
 		OAuthUserInfo userInfo = client.getUserInfo(accessToken);
 
 		User user = userRepository.findByProviderAndProviderId(
-			userInfo.getProvider(),
-			userInfo.getProviderId()
+				userInfo.getProvider(),
+				userInfo.getProviderId()
 			)
 			.orElseGet(() -> {
 				User newUser = userRepository.save(
@@ -100,9 +100,12 @@ public class UserService {
 
 		Long userId = jwtProvider.getUserIdFromToken(oldRefreshToken);
 		RefreshToken savedToken = getStoredRefreshToken(userId);
-
 		matchWithStoredToken(savedToken, oldRefreshToken);
-		String newAccessToken = jwtProvider.createAccessToken(userId);
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+		String newAccessToken = jwtProvider.createAccessToken(userId, user.getUserRole());
 
 		return new AccessTokenResponse(newAccessToken);
 	}
@@ -131,8 +134,8 @@ public class UserService {
 	}
 
 	private LoginResponse issueTokens(User user) {
-		String accessToken = jwtProvider.createAccessToken(user.getUserId());
-		String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+		String accessToken = jwtProvider.createAccessToken(user.getUserId(), user.getUserRole());
+		String refreshToken = jwtProvider.createRefreshToken(user.getUserId(), user.getUserRole());
 
 		RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getUserId())
 			.map(token -> {

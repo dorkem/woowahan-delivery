@@ -31,7 +31,6 @@ public class User {
 	@Column(name = "user_id")
 	private Long userId;
 
-	@Getter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
 	private UserRole role;
@@ -101,6 +100,10 @@ public class User {
 
 	public static User createOAuthUser(String email, String username, OAuthProvider provider, String providerId) {
 		return new User(email, username, provider, providerId);
+	}
+
+	public String getUserRole(){
+		return this.role.name();
 	}
 
 	public boolean matchPassword(String inputPassword) {
