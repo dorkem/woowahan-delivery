@@ -5,11 +5,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dorkem.food.category.entity.Category;
+import com.dorkem.food.common.config.S3Properties;
 import com.dorkem.food.order.service.OrderService;
+import com.dorkem.food.store.dto.request.CreateStoreRequest;
 import com.dorkem.food.store.dto.response.StorePageResponse;
 import com.dorkem.food.store.dto.response.StoreResponse.StoreSummaryResponse;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.repository.StoreQueryRepository;
+import com.dorkem.food.store.repository.StoreRepository;
+import com.dorkem.food.user.entity.Owner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,8 +22,32 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreService {
 
+	private final StoreRepository storeRepository;
 	private final StoreQueryRepository storeQueryRepository;
 	private final OrderService orderService;
+	private final S3Properties s3Properties;
+
+	public void createStore(CreateStoreRequest request, Owner owner, Category category) {
+
+		Store store = Store.createStore(
+			owner,
+			category,
+			request.storeName(),
+			request.businessNumber(),
+			request.storeAddress(),
+			request.storeAddressDetails(),
+			request.latitude(),
+			request.longitude(),
+			request.status(),
+			request.openTime(),
+			request.closeTime(),
+			request.minOrderAmount(),
+			request.baseDeliveryFee(),
+			s3Properties.getDefaultStoreImage()
+		);
+
+		storeRepository.save(store);
+	}
 
 	@Transactional
 	public StorePageResponse getStores(Integer categoryId, Long cursor, int size) {

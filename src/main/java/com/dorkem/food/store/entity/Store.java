@@ -120,6 +120,7 @@ public class Store {
 	) {
 		this.owner = owner;
 		this.category = category;
+		this.thumbnail = thumbnail;
 		this.storeName = storeName;
 		this.businessNumber = businessNumber;
 		this.storeAddress = storeAddress;
@@ -133,15 +134,19 @@ public class Store {
 		this.baseDeliveryFee = baseDeliveryFee;
 	}
 
-	public static Store createStore(Owner owner, Category category, String thumbnail,
-		String storeName, String businessNumber, String storeAddress, String storeAddressDetails,
+	public static Store createStore(Owner owner, Category category, String storeName,
+		String businessNumber, String storeAddress, String storeAddressDetails,
 		BigDecimal latitude, BigDecimal longitude, StoreStatus status, LocalTime openTime,
-		LocalTime closeTime, int minOrderAmount, int baseDeliveryFee
+		LocalTime closeTime, int minOrderAmount, int baseDeliveryFee, String defaultThumbnail
 	) {
 		return new Store(
-			owner, category, thumbnail, storeName, businessNumber, storeAddress, storeAddressDetails,
+			owner, category, defaultThumbnail, storeName, businessNumber, storeAddress, storeAddressDetails,
 			latitude, longitude, status, openTime, closeTime, minOrderAmount, baseDeliveryFee
 		);
+	}
+
+	public void updateThumbnail(String thumbnailUrl) {
+		this.thumbnail = thumbnailUrl;
 	}
 
 	public void addReview(Review review) {
