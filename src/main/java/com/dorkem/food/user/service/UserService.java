@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dorkem.food.common.config.S3Properties;
 import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.common.jwt.JwtProvider;
@@ -32,6 +33,7 @@ public class UserService {
 	private final CustomerRepository customerRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final JwtProvider jwtProvider;
+	private final S3Properties s3Properties;
 	private final List<OAuthClient> oAuthClients;
 
 	@Transactional
@@ -48,7 +50,8 @@ public class UserService {
 			request.username(),
 			request.userAccount(),
 			request.password(),
-			request.phoneNumber()
+			request.phoneNumber(),
+			s3Properties.getDefaultProfileImage()
 		);
 		userRepository.save(user);
 

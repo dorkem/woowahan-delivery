@@ -54,6 +54,10 @@ public class User {
 	@Column(name = "phone_number", unique = true)
 	private String phoneNumber;
 
+	@Getter
+	@Column(name = "user_profile", nullable = false)
+	private String userProfile;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "provider")
 	private OAuthProvider provider;
@@ -77,18 +81,22 @@ public class User {
 		this.role = UserRole.CUSTOMER;
 	}
 
-	private User(String email, String username, String userAccount, String password, String phoneNumber) {
+	private User(String email, String username, String userAccount, String password,
+		String phoneNumber, String userProfile
+	) {
 		this.email = email;
 		this.username = username;
 		this.userAccount = userAccount;
 		this.password = password;
 		this.phoneNumber = phoneNumber;
+		this.userProfile = userProfile;
 		this.role = UserRole.CUSTOMER;
 	}
 
 	public static User createUser(String email, String username, String userAccount, String password,
-		String phoneNumber) {
-		return new User(email, username, userAccount, password, phoneNumber);
+		String phoneNumber, String userProfile
+	) {
+		return new User(email, username, userAccount, password, phoneNumber, userProfile);
 	}
 
 	public static User createOAuthUser(String email, String username, OAuthProvider provider, String providerId) {
