@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -40,14 +41,19 @@ public class JwtProvider {
 	}
 
 	public Long getUserIdFromToken(String token) {
-		return Long.valueOf(
-			Jwts.parserBuilder()
-				.setSigningKey(SECRET_KEY.getBytes())
-				.build()
-				.parseClaimsJws(token)
-				.getBody()
-				.getSubject()
-		);
+		return Long.parseLong(getClaims(token).getSubject());
+	}
+
+	public String getRoleFromToken(String token) {
+		return getClaims(token).get("role", String.class);
+	}
+
+	private Claims getClaims(String token) {
+		return Jwts.parserBuilder()
+			.setSigningKey(SECRET_KEY.getBytes())
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
 	}
 
 	public boolean validateToken(String token) {

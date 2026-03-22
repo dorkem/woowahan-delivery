@@ -59,7 +59,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		// 프로퍼티 까기
 		Long userId = jwtProvider.getUserIdFromToken(token);
+		String role = jwtProvider.getRoleFromToken(token);
+
 		request.setAttribute("userId", userId);
+		request.setAttribute("role", role);
 
 		filterChain.doFilter(request, response);
 	}
