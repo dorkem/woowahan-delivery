@@ -3,6 +3,7 @@ package com.dorkem.food.menu.entity;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.dorkem.food.store.entity.Store;
@@ -32,6 +33,7 @@ public class Menu {
 	@Column(name = "menu_id")
 	private Long menuId;
 
+	@Getter
 	@ManyToOne
 	private Store store;
 
@@ -39,6 +41,7 @@ public class Menu {
 	@Column(name = "menu_name", nullable = false)
 	private String menuName;
 
+	@Getter
 	@Column(name = "menu_description")
 	private String menuDescription;
 
@@ -49,6 +52,10 @@ public class Menu {
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
+
+	@LastModifiedDate
+	@Column(name = "modified_at", nullable = false)
+	private LocalDateTime modifiedAt;
 
 	private Menu(Store store, String menuName, String menuDescription, int price
 	) {

@@ -27,6 +27,7 @@ import com.dorkem.food.order.repository.OrderRepository;
 import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.repository.StoreRepository;
 import com.dorkem.food.user.entity.Customer;
+import com.dorkem.food.user.repository.CustomerQueryRepository;
 import com.dorkem.food.user.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final OrderQueryRepository orderQueryRepository;
 	private final StoreRepository storeRepository;
-	private final CustomerRepository customerRepository;
+	private final CustomerQueryRepository customerQueryRepository;
 	private final MenuRepository menuRepository;
 
 	@Transactional
@@ -85,31 +86,19 @@ public class OrderService {
 
 	@Transactional(readOnly = true)
 	public OrderHistoryPageResponse getOrderHistory(Long userId, String cursor, int size) {
-		LocalDateTime cursorTime = null;
-		if (cursor == null || cursor.isBlank()) {
-			cursorTime = LocalDateTime.now();
-		} else if (cursor != null && !cursor.isBlank()) {
-			cursorTime = LocalDateTime.parse(cursor);
-		}
+		LocalDateTime cursorTime = (cursor == null || cursor.isBlank())
+			? LocalDateTime.now()
+			: LocalDateTime.parse(cursor);
 
 		// 6개 가져오고 이후에 데이터가 있는지 확인
 		List<Order> orders = orderQueryRepository.findOrderHistory(userId, cursorTime, size + 1);
 		boolean hasNext = orders.size() > size;
 
-		List<Order> content = null;
-		if (hasNext) {
-			content = orders.subList(0, size);
-		} else if (!hasNext) {
-			content = orders;
-		}
+		List<Order> content = hasNext ? orders.subList(0, size) : orders;
 
-		// 다음 위치 파악하는 것
-		String nextCursor = null;
-		if (hasNext) {
-			nextCursor = content.get(content.size() - 1).getCreatedAt().toString();
-		} else if (!hasNext) {
-			nextCursor = null;
-		}
+		String nextCursor = hasNext
+			? content.get(content.size() - 1).getCreatedAt().toString()
+			: null;
 
 		List<HistoryResponse> responseList = new ArrayList<>();
 		for (Order order : content) {
@@ -145,40 +134,33 @@ public class OrderService {
 	}
 
 	@Transactional
-	public void acceptOrder(String orderId) {
-		Order order = getOrder(orderId);
+	public void acceptOrder(Long storeId, String orderId) {
+		Order order = getOrdersByStore(storeId, orderId);
 		order.accept();
 	}
 
 	@Transactional
-	public void rejectOrder(String orderId) {
-		Order order = getOrder(orderId);
+	public void rejectOrder(Long storeId, String orderId) {
+		Order order = getOrdersByStore(storeId, orderId);
 		order.reject();
 	}
 
 	@Transactional
-	public void startCooking(String orderId) {
-		Order order = getOrder(orderId);
+	public void startCooking(Long storeId, String orderId) {
+		Order order = getOrdersByStore(storeId, orderId);
 		order.startCooking();
 	}
 
 	@Transactional
-	public void completeCooking(String orderId) {
-		Order order = getOrder(orderId);
+	public void completeCooking(Long storeId, String orderId) {
+		Order order = getOrdersByStore(storeId, orderId);
 		order.completeCooking();
 	}
 
-	// 배달 도메인
 	@Transactional
-	public void requestDispatch(String orderId) {
-		Order order = getOrder(orderId);
+	public void requestDispatch(Long storeId, String orderId) {
+		Order order = getOrdersByStore(storeId, orderId);
 		order.requestDispatch();
-	}
-
-	@Transactional
-	public void completeDispatch(String orderId) {
-		Order order = getOrder(orderId);
-		order.completeDispatch();
 	}
 
 	@Transactional
@@ -195,7 +177,9 @@ public class OrderService {
 
 	@Transactional
 	public void cancelOrder(String orderId) {
-		Order order = getOrder(orderId);
+		// TODO: 주문이 취소되는 경우가 어떤 경우인지 찾아보기
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
 		order.cancel();
 	}
 
@@ -204,8 +188,13 @@ public class OrderService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
 	}
 
+	private Order getOrdersByStore(Long storeId, String orderId) {
+		return orderRepository.findByOrderIdAndStoreStoreId(orderId, storeId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
+	}
+
 	private Customer getCustomer(Long userId) {
-		return customerRepository.findById(userId)
+		return customerQueryRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 

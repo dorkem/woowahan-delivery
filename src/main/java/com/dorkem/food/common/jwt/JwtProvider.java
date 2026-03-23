@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,20 +15,25 @@ public class JwtProvider {
 
 	@Value("${jwt.secret}")
 	private String SECRET_KEY;
-	private final long ACCESS_TOKEN_TIME = 1000 * 60 * 30;
-	private final long REFRESH_TOKEN_TIME = 1000 * 60 * 60 * 24 * 7;
 
-	public String createAccessToken(Long userId) {
-		return createToken(String.valueOf(userId), ACCESS_TOKEN_TIME);
+	@Value("${jwt.access-token-expiration}")
+	private long ACCESS_TOKEN_TIME;
+
+	@Value("${jwt.refresh-token-expiration}")
+	private long REFRESH_TOKEN_TIME;
+
+	public String createAccessToken(Long userId, String role) {
+		return createToken(String.valueOf(userId), role, ACCESS_TOKEN_TIME);
 	}
 
-	public String createRefreshToken(Long userId) {
-		return createToken(String.valueOf(userId), REFRESH_TOKEN_TIME);
+	public String createRefreshToken(Long userId, String role) {
+		return createToken(String.valueOf(userId), role, REFRESH_TOKEN_TIME);
 	}
 
-	private String createToken(String userId, long tokenValidTime) {
+	private String createToken(String userId, String role, long tokenValidTime) {
 		return Jwts.builder()
 			.setSubject(userId)
+			.claim("role", role)
 			.setIssuedAt(new Date())
 			.setExpiration(new Date(System.currentTimeMillis() + tokenValidTime))
 			.signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
@@ -35,14 +41,19 @@ public class JwtProvider {
 	}
 
 	public Long getUserIdFromToken(String token) {
-		return Long.valueOf(
-			Jwts.parserBuilder()
-				.setSigningKey(SECRET_KEY.getBytes())
-				.build()
-				.parseClaimsJws(token)
-				.getBody()
-				.getSubject()
-		);
+		return Long.parseLong(getClaims(token).getSubject());
+	}
+
+	public String getRoleFromToken(String token) {
+		return getClaims(token).get("role", String.class);
+	}
+
+	private Claims getClaims(String token) {
+		return Jwts.parserBuilder()
+			.setSigningKey(SECRET_KEY.getBytes())
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
 	}
 
 	public boolean validateToken(String token) {

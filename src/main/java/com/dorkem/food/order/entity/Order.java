@@ -127,10 +127,6 @@ public class Order {
 		this.changeStatus(OrderStatus.DISPATCH_REQUESTED);
 	}
 
-	public void completeDispatch() {
-		this.changeStatus(OrderStatus.DISPATCH_COMPLETED);
-	}
-
 	public void startDelivery() {
 		this.changeStatus(OrderStatus.DELIVERING);
 	}

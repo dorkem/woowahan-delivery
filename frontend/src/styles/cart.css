@@ -1,0 +1,134 @@
+/* Cart Sidebar Styles */
+.cart-sidebar {
+  position: fixed;
+  top: 80px; /* Below header */
+  right: 0;
+  width: 380px;
+  height: calc(100vh - 80px);
+  background-color: var(--surface);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.06);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%); /* Hidden by default */
+  transition: transform var(--transition-spring);
+  border-left: 1px solid var(--border);
+}
+
+.cart-sidebar.open {
+  transform: translateX(0);
+}
+
+.cart-header {
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.cart-title {
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.cart-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.cart-close:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-main);
+}
+
+.cart-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cart-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-main);
+  gap: var(--spacing-sm);
+}
+
+.cart-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.cart-footer {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  background-color: var(--surface);
+}
+
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-md);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.text-sm { font-size: var(--font-size-sm); }
+.text-muted { color: var(--text-muted); }
+
+/* Backdrop for mobile drawer */
+.cart-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 85;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.cart-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 1024px) {
+  .cart-sidebar {
+    top: 0;
+    height: 100vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-sidebar {
+    width: 100%;
+  }
+}

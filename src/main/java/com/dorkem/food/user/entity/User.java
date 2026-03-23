@@ -3,6 +3,7 @@ package com.dorkem.food.user.entity;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
@@ -31,39 +32,79 @@ public class User {
 	private Long userId;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "login_type", nullable = false)
-	private LoginType loginType;
+	@Column(name = "role", nullable = false)
+	private UserRole role;
 
+	@Getter
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
+	@Getter
 	@Column(name = "username", nullable = false)
 	private String username;
 
-	@Column(name = "password", nullable = false)
+	@Getter
+	@Column(name = "user_account")
+	private String userAccount;
+
+	@Column(name = "password")
 	private String password;
 
 	@Getter
-	@Column(name = "phone_number", nullable = false, unique = true)
+	@Column(name = "phone_number", unique = true)
 	private String phoneNumber;
+
+	@Getter
+	@Column(name = "user_profile", nullable = false)
+	private String userProfile;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider")
+	private OAuthProvider provider;
+
+	@Column(name = "provider_id")
+	private String providerId;
 
 	@CreatedDate
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	private User(LoginType loginType, String email, String username,
-		String password, String phoneNumber
-	) {
-		this.loginType = loginType;
+	@LastModifiedDate
+	@Column(name = "modified_at", nullable = false)
+	private LocalDateTime modifiedAt;
+
+	private User(String email, String username, OAuthProvider provider, String providerId) {
 		this.email = email;
 		this.username = username;
-		this.password = password;
-		this.phoneNumber = phoneNumber;
+		this.provider = provider;
+		this.providerId = providerId;
+		this.role = UserRole.CUSTOMER;
 	}
 
-	public static User createUser(LoginType loginType, String email,
-		String username, String password, String phoneNumber) {
-		return new User(loginType, email, username, password, phoneNumber);
+	private User(String email, String username, String userAccount, String password,
+		String phoneNumber, String userProfile
+	) {
+		this.email = email;
+		this.username = username;
+		this.userAccount = userAccount;
+		this.password = password;
+		this.phoneNumber = phoneNumber;
+		this.userProfile = userProfile;
+		this.role = UserRole.CUSTOMER;
+	}
+
+	public static User createUser(String email, String username, String userAccount, String password,
+		String phoneNumber, String userProfile
+	) {
+		return new User(email, username, userAccount, password, phoneNumber, userProfile);
+	}
+
+	public static User createOAuthUser(String email, String username, OAuthProvider provider, String providerId) {
+		return new User(email, username, provider, providerId);
+	}
+
+	public String getUserRole() {
+		return this.role.name();
 	}
 
 	public boolean matchPassword(String inputPassword) {

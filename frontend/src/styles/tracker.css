@@ -1,0 +1,156 @@
+/* Order Tracker Styles */
+
+.tracker-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tracker-card {
+  padding: var(--spacing-xxl);
+  text-align: center;
+}
+
+.tracker-header {
+  margin-bottom: var(--spacing-xxl);
+}
+
+.tracker-store-name {
+  font-size: var(--font-size-xl);
+  margin-top: var(--spacing-xs);
+}
+
+.tracker-steps {
+  position: relative;
+  margin-bottom: var(--spacing-xxl);
+}
+
+/* Progress Line Background */
+.tracker-progress-line {
+  position: absolute;
+  top: 24px;
+  left: 10%;
+  right: 10%;
+  height: 4px;
+  background-color: var(--border);
+  border-radius: var(--radius-pill);
+  z-index: 1;
+}
+
+.tracker-progress-fill {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: var(--radius-pill);
+  transition: width var(--transition-slow);
+}
+
+/* Steps List */
+.tracker-steps-list {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.tracker-step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 20%;
+}
+
+.tracker-step-icon {
+  width: 52px;
+  height: 52px;
+  background-color: var(--surface);
+  border: 4px solid var(--border);
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+  transition: all var(--transition-normal);
+}
+
+.tracker-step-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-muted);
+}
+
+/* Step States */
+.tracker-step-item.completed .tracker-step-icon {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: var(--text-inverse);
+}
+
+.tracker-step-item.completed .tracker-step-label {
+  color: var(--text-main);
+}
+
+.tracker-step-item.active .tracker-step-icon {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-light);
+  transform: scale(1.1);
+}
+
+.tracker-step-item.active .tracker-step-label {
+  color: var(--primary);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Pulsing effect for active state */
+.tracker-pulse {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-circle);
+  background-color: var(--primary);
+  opacity: 0.3;
+  animation: pulse 2s infinite ease-out;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+  100% { transform: translateX(-50%) scale(1.6); opacity: 0; }
+}
+
+/* ETA */
+.tracker-eta {
+  padding: var(--spacing-md);
+  background-color: var(--primary-light);
+  border-radius: var(--radius-md);
+  display: inline-block;
+  min-width: 250px;
+}
+
+.eta-time {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary);
+  margin-top: var(--spacing-xs);
+}
+
+@media (max-width: 768px) {
+  .tracker-step-label {
+    font-size: 10px;
+  }
+  .tracker-step-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  .tracker-progress-line {
+    top: 18px;
+  }
+  .tracker-pulse {
+    width: 40px;
+    height: 40px;
+  }
+}

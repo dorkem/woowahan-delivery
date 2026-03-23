@@ -1,16 +1,22 @@
 package com.dorkem.food.user.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dorkem.food.common.config.S3Properties;
 import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.common.jwt.JwtProvider;
+import com.dorkem.food.oauth.entity.client.OAuthClient;
+import com.dorkem.food.oauth.entity.info.OAuthUserInfo;
 import com.dorkem.food.user.dto.request.LoginRequest;
 import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
+import com.dorkem.food.user.dto.response.UserProfileResponse;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.entity.User;
 import com.dorkem.food.user.entity.auth.RefreshToken;
@@ -27,16 +33,26 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final CustomerRepository customerRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
-	private JwtProvider jwtProvider;
+	private final JwtProvider jwtProvider;
+	private final S3Properties s3Properties;
+	private final List<OAuthClient> oAuthClients;
 
 	@Transactional
 	public Long signup(SignupRequest request) {
+		if (userRepository.existsByEmail(request.email())) {
+			throw new CommonException(ErrorCode.DUPLICATED_EMAIL);
+		}
+		if (userRepository.existsByPhoneNumber(request.phoneNumber())) {
+			throw new CommonException(ErrorCode.DUPLICATED_PHONE_NUMBER);
+		}
+
 		User user = User.createUser(
-			request.loginType(),
 			request.email(),
 			request.username(),
+			request.userAccount(),
 			request.password(),
-			request.phoneNumber()
+			request.phoneNumber(),
+			s3Properties.getDefaultProfileImage()
 		);
 		userRepository.save(user);
 
@@ -48,11 +64,90 @@ public class UserService {
 
 	@Transactional
 	public LoginResponse login(LoginRequest request) {
-		User user = getUser(request);
+		User user = getUserByEmail(request);
 		matchPassword(request, user);
+		return issueTokens(user);
+	}
 
-		String accessToken = jwtProvider.createAccessToken(user.getUserId());
-		String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+	@Transactional
+	public LoginResponse oAuthLogin(String provider, String code) {
+		OAuthClient client = getClient(provider);
+		String accessToken = client.getAccessToken(code);
+		OAuthUserInfo userInfo = client.getUserInfo(accessToken);
+
+		User user = userRepository.findByProviderAndProviderId(
+				userInfo.getProvider(),
+				userInfo.getProviderId()
+			)
+			.orElseGet(() -> {
+				User newUser = userRepository.save(
+					User.createOAuthUser(
+						userInfo.getEmail(),
+						userInfo.getUsername(),
+						userInfo.getProvider(),
+						userInfo.getProviderId()
+					)
+				);
+				customerRepository.save(Customer.createCustomer(newUser));
+				return newUser;
+			});
+		return issueTokens(user);
+	}
+
+	@Transactional(readOnly = true)
+	public AccessTokenResponse refreshAccessToken(RefreshTokenRequest request) {
+		String oldRefreshToken = request.refreshToken();
+		isTokenValid(oldRefreshToken);
+
+		Long userId = jwtProvider.getUserIdFromToken(oldRefreshToken);
+		RefreshToken savedToken = getStoredRefreshToken(userId);
+		matchWithStoredToken(savedToken, oldRefreshToken);
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+		String newAccessToken = jwtProvider.createAccessToken(userId, user.getUserRole());
+
+		return new AccessTokenResponse(newAccessToken);
+	}
+
+	@Transactional
+	public void logout(Long userId) {
+		refreshTokenRepository.deleteByUserId(userId);
+	}
+
+	@Transactional(readOnly = true)
+	public UserProfileResponse getProfile(Long userId) {
+		User user = getUser(userId);
+		return UserProfileResponse.getUserInfo(user);
+	}
+
+	private void matchPassword(LoginRequest request, User user) {
+		if (!user.matchPassword(request.password())) {
+			throw new CommonException(ErrorCode.FAILURE_LOGIN);
+		}
+	}
+
+	private User getUser(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+	}
+
+	private User getUserByEmail(LoginRequest request) {
+		return userRepository.findByEmail(request.email())
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+	}
+
+	private OAuthClient getClient(String provider) {
+		return oAuthClients.stream()
+			.filter(client -> client.getProvider().name().equalsIgnoreCase(provider))
+			.findFirst()
+			.orElseThrow(() -> new CommonException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER));
+	}
+
+	private LoginResponse issueTokens(User user) {
+		String accessToken = jwtProvider.createAccessToken(user.getUserId(), user.getUserRole());
+		String refreshToken = jwtProvider.createRefreshToken(user.getUserId(), user.getUserRole());
 
 		RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getUserId())
 			.map(token -> {
@@ -63,36 +158,6 @@ public class UserService {
 		refreshTokenRepository.save(refreshTokenEntity);
 
 		return new LoginResponse(accessToken, refreshToken);
-	}
-
-	@Transactional(readOnly = true)
-	public AccessTokenResponse refreshAccessToken(RefreshTokenRequest request) {
-		String oldRefreshToken = request.refreshToken();
-		isTokenValid(oldRefreshToken);
-
-		Long userId = jwtProvider.getUserIdFromToken(oldRefreshToken);
-		RefreshToken savedToken = getStoredRefreshToken(userId);
-
-		matchWithStoredTorken(savedToken, oldRefreshToken);
-		String newAccessToken = jwtProvider.createAccessToken(userId);
-
-		return new AccessTokenResponse(newAccessToken);
-	}
-
-	@Transactional
-	public void logout(Long userId) {
-		refreshTokenRepository.deleteByUserId(userId);
-	}
-
-	private void matchPassword(LoginRequest request, User user) {
-		if (!user.matchPassword(request.password())) {
-			throw new CommonException(ErrorCode.FAILURE_LOGIN);
-		}
-	}
-
-	private User getUser(LoginRequest request) {
-		return userRepository.findByEmail(request.email())
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 	}
 
 	private void isTokenValid(String oldRefreshToken) {
@@ -106,9 +171,13 @@ public class UserService {
 			.orElseThrow(() -> new CommonException(ErrorCode.INVALID_TOKEN_ERROR));
 	}
 
-	private static void matchWithStoredTorken(RefreshToken savedToken, String oldRefreshToken) {
+	private static void matchWithStoredToken(RefreshToken savedToken, String oldRefreshToken) {
 		if (!savedToken.getToken().equals(oldRefreshToken)) {
 			throw new CommonException(ErrorCode.INVALID_TOKEN_ERROR);
 		}
+	}
+
+	public String getLoginUrl(String provider) {
+		return getClient(provider).getLoginUrl();
 	}
 }

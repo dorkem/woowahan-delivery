@@ -2,17 +2,22 @@ package com.dorkem.food.user.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dorkem.food.common.annotation.AuthUserId;
 import com.dorkem.food.common.response.ResponseDto;
 import com.dorkem.food.user.dto.request.LoginRequest;
 import com.dorkem.food.user.dto.request.RefreshTokenRequest;
 import com.dorkem.food.user.dto.request.SignupRequest;
 import com.dorkem.food.user.dto.response.AccessTokenResponse;
 import com.dorkem.food.user.dto.response.LoginResponse;
+import com.dorkem.food.user.dto.response.UserProfileResponse;
 import com.dorkem.food.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +44,19 @@ public class UserController {
 	public ResponseEntity<ResponseDto<LoginResponse>> login(
 		@RequestBody LoginRequest request
 	) {
-		LoginResponse response = userService.login(request);
-		return ResponseEntity.ok(ResponseDto.ok(response));
+		return ResponseEntity.ok(ResponseDto.ok(userService.login(request)));
+	}
+
+	@GetMapping("/oauth/{provider}/login")
+	public ResponseEntity<ResponseDto<String>> getOAuthToken(@PathVariable String provider) {
+		return ResponseEntity.ok(ResponseDto.ok(userService.getLoginUrl(provider)));
+	}
+
+	@GetMapping("/oauth/{provider}/callback")
+	public ResponseEntity<LoginResponse> oAuthLogin(
+		@PathVariable String provider,
+		@RequestParam String code) {
+		return ResponseEntity.ok(userService.oAuthLogin(provider, code));
 	}
 
 	@PostMapping("/auth/refresh")
@@ -58,5 +74,12 @@ public class UserController {
 		Long userId = (Long)request.getAttribute("userId");
 		userService.logout(userId);
 		return ResponseEntity.ok(ResponseDto.ok(null));
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<ResponseDto<UserProfileResponse>> getProfile(
+		@AuthUserId Long userId
+	) {
+		return ResponseEntity.ok(ResponseDto.ok(userService.getProfile(userId)));
 	}
 }

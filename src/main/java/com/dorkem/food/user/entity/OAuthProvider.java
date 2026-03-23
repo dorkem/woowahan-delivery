@@ -1,6 +1,6 @@
 package com.dorkem.food.user.entity;
 
-public enum LoginType {
+public enum OAuthProvider {
 	KAKAO,
 	GITHUB
 }
