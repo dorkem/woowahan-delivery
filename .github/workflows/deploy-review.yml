@@ -179,3 +179,4 @@ jobs:
           source: "frontend/dist/**"
           target: "/var/www/woowahan-delivery"
           strip_components: 2
+
