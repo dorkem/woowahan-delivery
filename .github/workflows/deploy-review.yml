@@ -27,9 +27,11 @@ jobs:
           npm run build
 
       - name: Create application-dev.yml
+        env:
+          APP_DEV_YML: ${{ secrets.APP_DEV_YML }}
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APP_DEV_YML }}" > src/main/resources/application-dev.yml
+          printf '%s' "$APP_DEV_YML" > src/main/resources/application-dev.yml
 
       - name: Build with Gradle
         run: |
@@ -179,4 +181,3 @@ jobs:
           source: "frontend/dist/**"
           target: "/var/www/woowahan-delivery"
           strip_components: 2
-
