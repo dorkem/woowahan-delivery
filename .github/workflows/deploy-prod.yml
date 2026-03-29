@@ -1,0 +1,202 @@
+name: 🚀 Deploy to Production (master)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: JDK 17 설정 (Amazon Corretto)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: 프론트엔드 빌드
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: 백엔드 빌드 (Gradle)
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build -x test
+
+      - name: 아티팩트 저장 (JAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*.jar
+          retention-days: 1
+
+      - name: 아티팩트 저장 (Frontend)
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 1
+
+      - name: 아티팩트 저장 (deploy.sh)
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-script
+          path: scripts/deploy.sh
+          retention-days: 1
+
+  deploy-app-server-1:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: 아티팩트 다운로드 (JAR)
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/
+
+      - name: 아티팩트 다운로드 (deploy.sh)
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-script
+          path: scripts/
+
+      - name: deploy.sh 전송 → EC2-2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.APP_SERVER_HOST_1 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          source: "scripts/deploy.sh"
+          target: "/home/ec2-user/woowahan-delivery"
+          strip_components: 1
+
+      - name: JAR 전송 → EC2-2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.APP_SERVER_HOST_1 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          source: "build/libs/*.jar"
+          target: "/home/ec2-user/woowahan-delivery"
+          strip_components: 2
+
+      - name: 배포 실행 → EC2-2 (prod)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.APP_SERVER_HOST_1 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          script: |
+            cd /home/ec2-user/woowahan-delivery
+            chmod +x deploy.sh
+            ./deploy.sh ${{ secrets.APP_SERVER_HOST_1 }} prod
+
+  deploy-app-server-2:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: 아티팩트 다운로드 (JAR)
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/
+
+      - name: 아티팩트 다운로드 (deploy.sh)
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-script
+          path: scripts/
+
+      - name: deploy.sh 전송 → EC2-3
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.APP_SERVER_HOST_2 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          source: "scripts/deploy.sh"
+          target: "/home/ec2-user/woowahan-delivery"
+          strip_components: 1
+
+      - name: JAR 전송 → EC2-3
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.APP_SERVER_HOST_2 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          source: "build/libs/*.jar"
+          target: "/home/ec2-user/woowahan-delivery"
+          strip_components: 2
+
+      - name: 배포 실행 → EC2-3 (prod)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.APP_SERVER_HOST_2 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          script: |
+            cd /home/ec2-user/woowahan-delivery
+            chmod +x deploy.sh
+            ./deploy.sh ${{ secrets.APP_SERVER_HOST_2 }} prod
+
+  deploy-frontend:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: 아티팩트 다운로드 (Frontend)
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+
+      - name: 아티팩트 다운로드 (nginx.conf)
+        uses: actions/download-artifact@v4
+        with:
+          name: nginx-conf
+          path: scripts/
+
+      - name: 프론트엔드 전송 → EC2-1
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.LB_SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          source: "frontend/dist/**"
+          target: "/var/www/woowahan-delivery"
+          strip_components: 2
+
+      - name: nginx.conf 전송 → EC2-1
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.LB_SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          source: "scripts/nginx.conf"
+          target: "/etc/nginx/conf.d"
+          strip_components: 1
+
+      - name: Nginx reload → EC2-1
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.LB_SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          script: |
+            sudo nginx -t && sudo systemctl reload nginxde
