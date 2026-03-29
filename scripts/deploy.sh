@@ -14,7 +14,7 @@ if [ -n "$CURRENT_PID" ]; then
 fi
 
 nohup java -jar "$JAR_FILE" \
-  -Dspring.profiles.active="$SPRING_PROFILE" \
+  --spring.profiles.active="$SPRING_PROFILE" \
   -Dkakao.redirect-uri="http://${SERVER_IP}/oauth/kakao/callback" \
   > "$DEPLOY_PATH/app.log" 2>&1 &
 
