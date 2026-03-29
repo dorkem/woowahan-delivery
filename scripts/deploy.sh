@@ -15,7 +15,6 @@ fi
 
 nohup java -jar "$JAR_FILE" \
   --spring.profiles.active="$SPRING_PROFILE" \
-  -Dkakao.redirect-uri="http://${SERVER_IP}/oauth/kakao/callback" \
   > "$DEPLOY_PATH/app.log" 2>&1 &
 
 echo "배포 완료 → tail -f $DEPLOY_PATH/app.log"
