@@ -18,3 +18,4 @@ nohup java -jar "$JAR_FILE" \
   > "$DEPLOY_PATH/app.log" 2>&1 &
 
 echo "배포 완료 → tail -f $DEPLOY_PATH/app.log"
+
