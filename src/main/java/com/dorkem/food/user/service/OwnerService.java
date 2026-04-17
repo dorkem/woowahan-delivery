@@ -84,9 +84,14 @@ public class OwnerService {
 	}
 
 	@Transactional
-	public void toggleMenuSoldOut(Long storeId, Long menuId) {
+	public void updateMenuSoldOutStatus(Long storeId, Long menuId) {
 		Menu menu = getMenu(menuId, storeId);
-		menu.toggleSoldOut();
+
+		if (menu.isSoldOut()) {
+			menu.markOnSale();
+		} else {
+			menu.markSoldOut();
+		}
 	}
 
 	private User getUserByEmail(String email) {
