@@ -67,7 +67,7 @@ public class JwtProvider {
 	}
 
 	public Long getStoreIdFromToken(String token) {
-		return getClaims(token).get(CLAIM_ROLE, Long.class);
+		return getClaims(token).get(CLAIM_STORE_ID, Long.class);
 	}
 
 	private Claims getClaims(String token) {
