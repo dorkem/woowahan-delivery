@@ -35,9 +35,8 @@ public class Menu {
 	private Long menuId;
 
 	@Getter
-	@ManyToOne
-	@JoinColumn(name = "store_id")
-	private Store store;
+	@Column(name = "store_id", nullable = false)
+	private Long storeId;
 
 	@Getter
 	@Column(name = "menu_name", nullable = false)
@@ -71,16 +70,16 @@ public class Menu {
 	@Column(name = "modified_at", nullable = false)
 	private LocalDateTime modifiedAt;
 
-	private Menu(Store store, String menuName, String menuDescription, int price
+	private Menu(Long storeId, String menuName, String menuDescription, int price
 	) {
-		this.store = store;
+		this.storeId = storeId;
 		this.menuName = menuName;
 		this.menuDescription = menuDescription;
 		this.price = price;
 	}
 
-	public static Menu createMenu(Store store, String menuName, String menuDescription, int price
+	public static Menu createMenu(Long storeId, String menuName, String menuDescription, int price
 	) {
-		return new Menu(store, menuName, menuDescription, price);
+		return new Menu(storeId, menuName, menuDescription, price);
 	}
 }

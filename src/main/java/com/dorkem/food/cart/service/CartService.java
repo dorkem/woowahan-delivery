@@ -15,9 +15,10 @@ import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.menu.entity.Menu;
 import com.dorkem.food.menu.repository.MenuRepository;
+import com.dorkem.food.store.entity.Store;
+import com.dorkem.food.store.repository.StoreRepository;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.repository.CustomerQueryRepository;
-import com.dorkem.food.user.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,7 @@ public class CartService {
 	private final CartQueryRepository cartQueryRepository;
 	private final CustomerQueryRepository customerQueryRepository;
 	private final MenuRepository menuRepository;
+	private final StoreRepository storeRepository;
 
 	@Transactional
 	public CartResponse getCart(Long userId) {
@@ -43,13 +45,14 @@ public class CartService {
 		Customer customer = getCustomer(userId);
 		Cart cart = getOrCreateCart(customer);
 		Menu menu = getMenu(request);
+		Store store = getStore(menu.getStoreId());
 
 		cart.getItems().stream()
 			.filter(item -> item.getMenu().getMenuId().equals(menu.getMenuId()))
 			.findFirst()
 			.ifPresentOrElse(
 				item -> item.updateQuantity(request.quantity()),
-				() -> cart.addItem(menu.getStore(), CartItem.createCartItem(menu, request.quantity()))
+				() -> cart.addItem(store, CartItem.createCartItem(menu, request.quantity()))
 			);
 
 		return CartResponse.createCartResponse(cart);
@@ -107,6 +110,11 @@ public class CartService {
 	private Cart getCart(Customer customer) {
 		return cartQueryRepository.getCustomerCart(customer.getCustomerId())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CART));
+	}
+
+	private Store getStore(Long storeId) {
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_STORE));
 	}
 
 	private void removeCartItem(Cart cart, CartItem cartItem) {
