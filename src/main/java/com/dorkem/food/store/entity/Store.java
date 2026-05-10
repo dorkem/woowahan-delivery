@@ -64,9 +64,6 @@ public class Store {
 	StoreReviewStatus reviewStatus = new StoreReviewStatus();
 
 	@OneToMany(mappedBy = "store")
-	private List<Review> reviews = new ArrayList<>();
-
-	@OneToMany(mappedBy = "store")
 	private List<Order> orders;
 
 	@Getter
@@ -157,10 +154,7 @@ public class Store {
 		this.thumbnail = thumbnailUrl;
 	}
 
-	public void addReview(Review review) {
-		this.reviews.add(review);
-		review.assignStore(this);
-
-		this.reviewStatus = this.reviewStatus.addReview(review.getRating());
+	public void addReview(int rating) {
+		this.reviewStatus = this.reviewStatus.addReview(rating);
 	}
 }

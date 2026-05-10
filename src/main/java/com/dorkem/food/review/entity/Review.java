@@ -43,9 +43,8 @@ public class Review {
 	@Column(name = "content", nullable = false)
 	private String content;
 
-	@ManyToOne
-	@JoinColumn(name = "store_id")
-	private Store store;
+	@Column(name = "store_id", nullable = false)
+	private Long storeId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id", nullable = false)
@@ -63,19 +62,15 @@ public class Review {
 	@Column(name = "modified_at", nullable = false)
 	private LocalDateTime modifiedAt;
 
-	private Review(Store store, Customer customer, Order order, int rating, String content) {
-		this.store = store;
+	private Review(Long storeId, Customer customer, Order order, int rating, String content) {
+		this.storeId = storeId;
 		this.customer = customer;
 		this.order = order;
 		this.rating = rating;
 		this.content = content;
 	}
 
-	public static Review createReview(Store store, Customer customer, Order order, int rating, String content) {
-		return new Review(store, customer, order, rating, content);
-	}
-
-	public void assignStore(Store store) {
-		this.store = store;
+	public static Review createReview(Long storeId, Customer customer, Order order, int rating, String content) {
+		return new Review(storeId, customer, order, rating, content);
 	}
 }
