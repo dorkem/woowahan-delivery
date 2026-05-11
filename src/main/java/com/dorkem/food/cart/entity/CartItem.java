@@ -1,7 +1,5 @@
 package com.dorkem.food.cart.entity;
 
-import com.dorkem.food.store.entity.Menu;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,20 +29,23 @@ public class CartItem {
 	@JoinColumn(name = "cart_id", nullable = false)
 	private Cart cart;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "menu_id", nullable = false)
-	private Menu menu;
+	@Column(name = "menu_id", nullable = false)
+	private Long menuId;
+
+	@Column(name = "price", nullable = false)
+	private int price;
 
 	@Column(name = "quantity", nullable = false)
 	private int quantity;
 
-	private CartItem(Menu menu, int quantity){
-		this.menu = menu;
+	private CartItem(Long menuId, int price, int quantity) {
+		this.menuId = menuId;
+		this.price = price;
 		this.quantity = quantity;
 	}
 
-	public static CartItem createCartItem(Menu menu, int quantity){
-		return new CartItem(menu, quantity);
+	public static CartItem createCartItem(Long menuId, int price, int quantity) {
+		return new CartItem(menuId, price, quantity);
 	}
 
 	public void assignCart(Cart cart){
@@ -56,6 +57,6 @@ public class CartItem {
 	}
 
 	public int getSubtotal() {
-		return this.menu.getPrice() * this.quantity;
+		return this.price * this.quantity;
 	}
 }

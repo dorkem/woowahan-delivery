@@ -45,14 +45,16 @@ public class CartService {
 		Customer customer = getCustomer(userId);
 		Cart cart = getOrCreateCart(customer);
 		Menu menu = getMenu(request);
-		Store store = getStore(menu.getStoreId());
 
 		cart.getItems().stream()
-			.filter(item -> item.getMenu().getMenuId().equals(menu.getMenuId()))
+			.filter(item -> item.getMenuId().equals(menu.getMenuId()))
 			.findFirst()
 			.ifPresentOrElse(
 				item -> item.updateQuantity(request.quantity()),
-				() -> cart.addItem(store, CartItem.createCartItem(menu, request.quantity()))
+				() -> cart.addItem(
+					menu.getStoreId(),
+					CartItem.createCartItem(menu.getMenuId(), menu.getPrice(), request.quantity())
+				)
 			);
 
 		return CartResponse.createCartResponse(cart);

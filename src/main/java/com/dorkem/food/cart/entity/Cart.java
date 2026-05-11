@@ -8,19 +8,16 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.user.entity.Customer;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -44,9 +41,8 @@ public class Cart {
 	@JoinColumn(name = "customer_id", nullable = false, unique = true)
 	private Customer customer;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "store_id")
-	private Store store;
+	@Column(name = "store_id")
+	private Long storeId;
 
 	@OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
 	private List<CartItem> items = new ArrayList<>();
@@ -67,18 +63,18 @@ public class Cart {
 		return new Cart(customer);
 	}
 
-	public void addItem(Store store, CartItem item) {
-		if (this.store != null && !this.store.getStoreId().equals(store.getStoreId())) {
+	public void addItem(Long storeId, CartItem item) {
+		if (this.storeId != null && !this.storeId.equals(storeId)) {
 			this.items.clear();
 		}
-		this.store = store;
+		this.storeId = storeId;
 		this.items.add(item);
 		item.assignCart(this);
 	}
 
 	public void clearItems() {
 		this.items.clear();
-		this.store = null;
+		this.storeId = null;
 	}
 
 	public int getTotalPrice() {
