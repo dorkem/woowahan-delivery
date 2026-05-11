@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
-import com.dorkem.food.menu.entity.Menu;
-import com.dorkem.food.menu.repository.MenuRepository;
+import com.dorkem.food.store.entity.Menu;
+import com.dorkem.food.store.repository.MenuRepository;
 import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.dto.request.OrderCreateItemRequest;
@@ -28,7 +28,6 @@ import com.dorkem.food.store.entity.Store;
 import com.dorkem.food.store.repository.StoreRepository;
 import com.dorkem.food.user.entity.Customer;
 import com.dorkem.food.user.repository.CustomerQueryRepository;
-import com.dorkem.food.user.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
 

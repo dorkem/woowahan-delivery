@@ -2,7 +2,7 @@ package com.dorkem.food.cart.repository;
 
 import static com.dorkem.food.cart.entity.QCartItem.*;
 import static com.dorkem.food.cart.entity.QCart.*;
-import static com.dorkem.food.menu.entity.QMenu.*;
+import static com.dorkem.food.store.entity.QMenu.*;
 
 import java.util.Optional;
 

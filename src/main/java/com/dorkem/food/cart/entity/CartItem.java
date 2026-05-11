@@ -1,6 +1,6 @@
 package com.dorkem.food.cart.entity;
 
-import com.dorkem.food.menu.entity.Menu;
+import com.dorkem.food.store.entity.Menu;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

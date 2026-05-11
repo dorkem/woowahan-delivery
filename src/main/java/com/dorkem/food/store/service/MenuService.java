@@ -1,11 +1,11 @@
-package com.dorkem.food.menu.service;
+package com.dorkem.food.store.service;
 
-import static com.dorkem.food.menu.dto.response.MenuResponse.*;
+import static com.dorkem.food.store.dto.response.MenuResponse.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dorkem.food.menu.repository.MenuRepository;
+import com.dorkem.food.store.repository.MenuRepository;
 
 import lombok.RequiredArgsConstructor;
 

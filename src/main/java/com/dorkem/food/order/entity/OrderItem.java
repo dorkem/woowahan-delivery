@@ -2,7 +2,7 @@ package com.dorkem.food.order.entity;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.dorkem.food.menu.entity.Menu;
+import com.dorkem.food.store.entity.Menu;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
