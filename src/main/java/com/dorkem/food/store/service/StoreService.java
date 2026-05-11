@@ -27,11 +27,11 @@ public class StoreService {
 	private final OrderService orderService;
 	private final S3Properties s3Properties;
 
-	public void createStore(CreateStoreRequest request, Owner owner, Category category) {
+	public void createStore(CreateStoreRequest request, Owner owner, Long categoryId) {
 
 		Store store = Store.createStore(
 			owner,
-			category,
+			categoryId,
 			request.storeName(),
 			request.businessNumber(),
 			request.storeAddress(),
