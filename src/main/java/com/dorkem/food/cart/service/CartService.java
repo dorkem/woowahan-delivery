@@ -36,14 +36,14 @@ public class CartService {
 	@Transactional
 	public CartResponse getCart(Long userId) {
 		Customer customer = getCustomer(userId);
-		Cart cart = getOrCreateCart(customer);
+		Cart cart = getOrCreateCart(customer.getCustomerId());
 		return CartResponse.createCartResponse(cart);
 	}
 
 	@Transactional
 	public CartResponse addItem(Long userId, AddCartItemRequest request) {
 		Customer customer = getCustomer(userId);
-		Cart cart = getOrCreateCart(customer);
+		Cart cart = getOrCreateCart(customer.getCustomerId());
 		Menu menu = getMenu(request);
 
 		cart.getItems().stream()
@@ -53,7 +53,7 @@ public class CartService {
 				item -> item.updateQuantity(request.quantity()),
 				() -> cart.addItem(
 					menu.getStoreId(),
-					CartItem.createCartItem(menu.getMenuId(), menu.getPrice(), request.quantity())
+					CartItem.createCartItem(menu.getMenuId(), menu.getMenuName(), menu.getPrice(), request.quantity())
 				)
 			);
 
@@ -63,7 +63,7 @@ public class CartService {
 	@Transactional
 	public CartResponse updateItem(Long userId, Long cartItemId, UpdateCartItemRequest request) {
 		Customer customer = getCustomer(userId);
-		Cart cart = getCart(customer);
+		Cart cart = findExistingCart(customer.getCustomerId());
 		CartItem cartItem = findItemInCart(cartItemId, cart);
 
 		cartItem.updateQuantity(request.quantity());
@@ -78,7 +78,7 @@ public class CartService {
 	@Transactional
 	public CartResponse removeItem(Long userId, Long cartItemId) {
 		Customer customer = getCustomer(userId);
-		Cart cart = getCart(customer);
+		Cart cart = findExistingCart(customer.getCustomerId());
 		CartItem cartItem = findItemInCart(cartItemId, cart);
 
 		cart.getItems().remove(cartItem);
@@ -92,9 +92,9 @@ public class CartService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CUSTOMER));
 	}
 
-	private Cart getOrCreateCart(Customer customer) {
-		return cartQueryRepository.getCustomerCart(customer.getCustomerId())
-			.orElseGet(() -> cartRepository.save(Cart.createCart(customer)));
+	private Cart getOrCreateCart(Long customerId) {
+		return cartQueryRepository.getCustomerCart(customerId)
+			.orElseGet(() -> cartRepository.save(Cart.createCart(customerId)));
 	}
 
 	private Menu getMenu(AddCartItemRequest request) {
@@ -109,8 +109,8 @@ public class CartService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CART_ITEM));
 	}
 
-	private Cart getCart(Customer customer) {
-		return cartQueryRepository.getCustomerCart(customer.getCustomerId())
+	private Cart findExistingCart(Long customerId) {
+		return cartQueryRepository.getCustomerCart(customerId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_CART));
 	}
 

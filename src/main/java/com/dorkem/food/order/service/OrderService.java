@@ -61,7 +61,11 @@ public class OrderService {
 			deliveryReq.deliveryDirections()
 		);
 
-		Order order = Order.createOrder(store, customer, orderRequirement, userDeliveryInfo, orderItems);
+		Order order = Order.createOrder(
+			store.getStoreId(), store.getStoreName(),
+			customer.getCustomerId(), customer.getPhoneNumber(),
+			orderRequirement, userDeliveryInfo, orderItems
+		);
 		orderRepository.save(order);
 
 		return order.getOrderId();
@@ -188,7 +192,7 @@ public class OrderService {
 	}
 
 	private Order getOrdersByStore(Long storeId, String orderId) {
-		return orderRepository.findByOrderIdAndStoreStoreId(orderId, storeId)
+		return orderRepository.findByOrderIdAndStoreId(orderId, storeId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
 	}
 
@@ -209,7 +213,7 @@ public class OrderService {
 			Menu menu = menuRepository.findById(itemReq.menuId())
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MENU));
 
-			orderItems.add(OrderItem.createOrderItem(menu, itemReq.quantity()));
+			orderItems.add(OrderItem.createOrderItem(menu.getMenuId(), menu.getMenuName(), menu.getPrice(), itemReq.quantity()));
 		}
 
 		return orderItems;

@@ -17,6 +17,6 @@ public class MenuService {
 
 	@Transactional
 	public MenuListResponse getMenusByStore(Long storeId) {
-		return MenuListResponse.createMenuListResponse(menuRepository.findByStore_StoreId(storeId));
+		return MenuListResponse.createMenuListResponse(menuRepository.findByStoreId(storeId));
 	}
 }

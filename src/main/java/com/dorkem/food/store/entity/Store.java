@@ -3,16 +3,12 @@ package com.dorkem.food.store.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.dorkem.food.category.entity.Category;
-import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.store.entity.embedded.StoreReviewStatus;
-import com.dorkem.food.user.entity.Owner;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -20,13 +16,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,9 +37,8 @@ public class Store {
 	@Column(name = "store_id")
 	private Long storeId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "owner_id", nullable = false)
-	private Owner owner;
+	@Column(name = "owner_id", nullable = false)
+	private Long ownerId;
 
 	@Column(name = "category_id", nullable = false)
 	private Long categoryId;
@@ -59,9 +50,6 @@ public class Store {
 	@Getter
 	@Embedded
 	StoreReviewStatus reviewStatus = new StoreReviewStatus();
-
-	@OneToMany(mappedBy = "store")
-	private List<Order> orders;
 
 	@Getter
 	@Column(name = "store_name", nullable = false)
@@ -108,11 +96,11 @@ public class Store {
 	@Column(name = "modified_at", nullable = false)
 	private LocalDateTime modifiedAt;
 
-	private Store(Owner owner, Long categoryId, String thumbnail, String storeName, String businessNumber,
+	private Store(Long ownerId, Long categoryId, String thumbnail, String storeName, String businessNumber,
 		String storeAddress, String storeAddressDetails, BigDecimal latitude, BigDecimal longitude,
 		StoreStatus status, LocalTime openTime, LocalTime closeTime, int minOrderAmount, int baseDeliveryFee
 	) {
-		this.owner = owner;
+		this.ownerId = ownerId;
 		this.categoryId = categoryId;
 		this.thumbnail = thumbnail;
 		this.storeName = storeName;
@@ -128,13 +116,13 @@ public class Store {
 		this.baseDeliveryFee = baseDeliveryFee;
 	}
 
-	public static Store createStore(Owner owner, Long categoryId, String storeName,
+	public static Store createStore(Long ownerId, Long categoryId, String storeName,
 		String businessNumber, String storeAddress, String storeAddressDetails,
 		BigDecimal latitude, BigDecimal longitude, StoreStatus status, LocalTime openTime,
 		LocalTime closeTime, int minOrderAmount, int baseDeliveryFee, String defaultThumbnail
 	) {
 		return new Store(
-			owner, categoryId, defaultThumbnail, storeName, businessNumber, storeAddress, storeAddressDetails,
+			ownerId, categoryId, defaultThumbnail, storeName, businessNumber, storeAddress, storeAddressDetails,
 			latitude, longitude, status, openTime, closeTime, minOrderAmount, baseDeliveryFee
 		);
 	}

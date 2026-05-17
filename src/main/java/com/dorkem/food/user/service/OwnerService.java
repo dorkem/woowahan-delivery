@@ -111,7 +111,7 @@ public class OwnerService {
 	}
 
 	private void validateStoreAccess(Long storeId, Owner owner) {
-		storeQueryRepository.findByIdAndOwner(storeId, owner)
+		storeQueryRepository.findByIdAndOwnerId(storeId, owner.getOwnerId())
 			.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN_STORE_ACCESS));
 	}
 

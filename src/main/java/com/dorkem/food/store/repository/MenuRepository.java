@@ -10,5 +10,5 @@ import com.dorkem.food.store.entity.Menu;
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-	List<Menu> findByStore_StoreId(Long storeId);
+	List<Menu> findByStoreId(Long storeId);
 }
