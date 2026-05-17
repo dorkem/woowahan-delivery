@@ -27,10 +27,13 @@ public enum ErrorCode {
 	NOT_FOUND_ORDER(40406, HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
 	NOT_FOUND_CART(40407, HttpStatus.NOT_FOUND, "해당 장바구니를 찾을 수 없습니다."),
 	NOT_FOUND_CART_ITEM(40408, HttpStatus.NOT_FOUND, "해당 장바구니 메뉴를 찾을 수 없습니다."),
-	NOT_FOUND_CURRENT_ORDER(40407, HttpStatus.NOT_FOUND, "현재 진행 중인 주문이 없습니다."),
-	NOT_FOUND_ORDER_HISTORY(40408, HttpStatus.NOT_FOUND, "주문 내역을 찾을 수 없습니다."),
+	NOT_FOUND_CURRENT_ORDER(40409, HttpStatus.NOT_FOUND, "현재 진행 중인 주문이 없습니다."),
+	NOT_FOUND_ORDER_HISTORY(40410, HttpStatus.NOT_FOUND, "주문 내역을 찾을 수 없습니다."),
+	NOT_FOUND_PAYMENT(40411, HttpStatus.NOT_FOUND, "해당 결제 내역을 찾을 수 없습니다."),
 	DUPLICATED_EMAIL(40901, HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
 	DUPLICATED_PHONE_NUMBER(40902, HttpStatus.CONFLICT, "이미 가입된 휴대폰 번호입니다."),
+	PAYMENT_ALREADY_EXISTS(40903, HttpStatus.CONFLICT, "이미 결제가 존재하는 주문입니다."),
+	PAYMENT_FAILED(50001, HttpStatus.INTERNAL_SERVER_ERROR, "결제 처리 중 오류가 발생했습니다."),
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러입니다.");
 
 	private final Integer code;
