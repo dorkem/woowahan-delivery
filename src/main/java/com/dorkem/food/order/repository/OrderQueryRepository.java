@@ -26,7 +26,7 @@ public class OrderQueryRepository {
 			queryFactory
 				.selectFrom(order)
 				.where(
-					order.customerId.eq(customerId),
+					order.customerSnapshot.customerId.eq(customerId),
 					order.isActive.isTrue()
 				)
 				.fetchOne()
@@ -39,7 +39,7 @@ public class OrderQueryRepository {
 				.selectFrom(order)
 				.where(
 					order.orderId.eq(orderId),
-					order.customerId.eq(customerId),
+					order.customerSnapshot.customerId.eq(customerId),
 					order.isDeleted.isFalse()
 				)
 				.fetchOne()
@@ -50,7 +50,7 @@ public class OrderQueryRepository {
 		return queryFactory
 			.selectFrom(order)
 			.where(
-				order.customerId.eq(customerId),
+				order.customerSnapshot.customerId.eq(customerId),
 				order.isDeleted.isFalse(),
 				order.createdAt.lt(cursor)
 			)
@@ -64,7 +64,7 @@ public class OrderQueryRepository {
 			.selectFrom(order)
 			.join(order.orderItems, orderItem).fetchJoin()
 			.where(
-				order.storeId.eq(storeId),
+				order.storeSnapshot.storeId.eq(storeId),
 				order.isActive.isTrue()
 			)
 			.orderBy(order.createdAt.asc())
@@ -76,7 +76,7 @@ public class OrderQueryRepository {
 			.selectFrom(order)
 			.join(order.orderItems, orderItem).fetchJoin()
 			.where(
-				order.storeId.eq(storeId),
+				order.storeSnapshot.storeId.eq(storeId),
 				order.isActive.isFalse()
 			)
 			.orderBy(order.createdAt.desc())

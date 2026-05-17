@@ -8,7 +8,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.dorkem.food.order.entity.embedded.OrderCustomerSnapshot;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
+import com.dorkem.food.order.entity.embedded.OrderStoreSnapshot;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 
 import jakarta.persistence.CascadeType;
@@ -40,17 +42,14 @@ public class Order {
 	@Column(name = "order_id")
 	private String orderId;
 
-	@Column(name = "store_id", nullable = false)
-	private Long storeId;
+	@Embedded
+	private OrderStoreSnapshot storeSnapshot;
 
-	@Column(name = "store_name", nullable = false)
-	private String storeName;
+	@Embedded
+	private OrderCustomerSnapshot customerSnapshot;
 
-	@Column(name = "customer_id", nullable = false)
-	private Long customerId;
-
-	@Column(name = "customer_phone", nullable = false)
-	private String customerPhone;
+	@Column(name = "delivery_fee", nullable = false)
+	private int deliveryFee;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "order_id", nullable = false, updatable = false)
@@ -84,19 +83,19 @@ public class Order {
 	@Column(name = "modified_at", nullable = false)
 	private LocalDateTime modifiedAt;
 
-	private Order(Long storeId, String storeName, Long customerId, String customerPhone,
+	private Order(OrderStoreSnapshot storeSnapshot, OrderCustomerSnapshot customerSnapshot, int deliveryFee,
 		OrderRequirement orderRequirement, UserDeliveryInfo userDeliveryInfo) {
-		this.storeId = storeId;
-		this.storeName = storeName;
-		this.customerId = customerId;
-		this.customerPhone = customerPhone;
+		this.storeSnapshot = storeSnapshot;
+		this.customerSnapshot = customerSnapshot;
+		this.deliveryFee = deliveryFee;
 		this.orderRequirement = orderRequirement;
 		this.userDeliveryInfo = userDeliveryInfo;
 	}
 
-	public static Order createOrder(Long storeId, String storeName, Long customerId, String customerPhone,
-		OrderRequirement orderRequirement, UserDeliveryInfo userDeliveryInfo, List<OrderItem> orderItems) {
-		Order order = new Order(storeId, storeName, customerId, customerPhone, orderRequirement, userDeliveryInfo);
+	public static Order createOrder(OrderStoreSnapshot storeSnapshot, OrderCustomerSnapshot customerSnapshot,
+		int deliveryFee, OrderRequirement orderRequirement, UserDeliveryInfo userDeliveryInfo,
+		List<OrderItem> orderItems) {
+		Order order = new Order(storeSnapshot, customerSnapshot, deliveryFee, orderRequirement, userDeliveryInfo);
 		orderItems.forEach(order::addOrderItem);
 		order.initStatus();
 		return order;
@@ -165,19 +164,23 @@ public class Order {
 	}
 
 	public Long getStoreId() {
-		return storeId;
+		return storeSnapshot.getStoreId();
 	}
 
 	public String getStoreName() {
-		return storeName;
+		return storeSnapshot.getStoreName();
 	}
 
 	public Long getCustomerId() {
-		return customerId;
+		return customerSnapshot.getCustomerId();
 	}
 
 	public String getCustomerPhone() {
-		return customerPhone;
+		return customerSnapshot.getCustomerPhone();
+	}
+
+	public int getDeliveryFee() {
+		return deliveryFee;
 	}
 
 	public UserDeliveryInfo getUserDeliveryInfo() {
@@ -204,9 +207,13 @@ public class Order {
 		return createdAt;
 	}
 
-	public int getTotalPrice() {
+	public int getOrderAmount() {
 		return orderItems.stream()
 			.mapToInt(OrderItem::getTotalPrice)
 			.sum();
+	}
+
+	public int getTotalPrice() {
+		return getOrderAmount() + deliveryFee;
 	}
 }

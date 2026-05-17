@@ -20,7 +20,9 @@ import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
 import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderItem;
+import com.dorkem.food.order.entity.embedded.OrderCustomerSnapshot;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
+import com.dorkem.food.order.entity.embedded.OrderStoreSnapshot;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 import com.dorkem.food.order.repository.OrderQueryRepository;
 import com.dorkem.food.order.repository.OrderRepository;
@@ -62,9 +64,9 @@ public class OrderService {
 		);
 
 		Order order = Order.createOrder(
-			store.getStoreId(), store.getStoreName(),
-			customer.getCustomerId(), customer.getPhoneNumber(),
-			orderRequirement, userDeliveryInfo, orderItems
+			new OrderStoreSnapshot(store.getStoreId(), store.getStoreName()),
+			new OrderCustomerSnapshot(customer.getCustomerId(), customer.getPhoneNumber()),
+			store.getBaseDeliveryFee(), orderRequirement, userDeliveryInfo, orderItems
 		);
 		orderRepository.save(order);
 
@@ -186,13 +188,19 @@ public class OrderService {
 		order.cancel();
 	}
 
+	@Transactional(readOnly = true)
+	public Order findOrderById(String orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
+	}
+
 	private Order getOrder(String orderId) {
 		return orderRepository.findById(orderId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
 	}
 
 	private Order getOrdersByStore(Long storeId, String orderId) {
-		return orderRepository.findByOrderIdAndStoreId(orderId, storeId)
+		return orderRepository.findByOrderIdAndStoreSnapshotStoreId(orderId, storeId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER));
 	}
 

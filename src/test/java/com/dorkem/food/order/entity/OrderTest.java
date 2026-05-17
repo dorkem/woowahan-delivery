@@ -9,7 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.dorkem.food.order.entity.embedded.OrderCustomerSnapshot;
 import com.dorkem.food.order.entity.embedded.OrderRequirement;
+import com.dorkem.food.order.entity.embedded.OrderStoreSnapshot;
 import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
 
 @DisplayName("Order 엔티티 테스트")
@@ -22,7 +24,11 @@ class OrderTest {
 		UserDeliveryInfo userDeliveryInfo = mock(UserDeliveryInfo.class);
 		List<OrderItem> orderItems = List.of(mock(OrderItem.class));
 
-		order = Order.createOrder(1L, "테스트가게", 1L, "010-0000-0000", orderRequirement, userDeliveryInfo, orderItems);
+		order = Order.createOrder(
+			new OrderStoreSnapshot(1L, "테스트가게"),
+			new OrderCustomerSnapshot(1L, "010-0000-0000"),
+			3000, orderRequirement, userDeliveryInfo, orderItems
+		);
 	}
 
 	@Test
