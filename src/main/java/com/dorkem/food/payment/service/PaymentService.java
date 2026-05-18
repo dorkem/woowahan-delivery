@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
-import com.dorkem.food.order.entity.Order;
-import com.dorkem.food.order.service.OrderService;
 import com.dorkem.food.payment.entity.Payment;
+import com.dorkem.food.payment.event.PaymentCompletedEvent;
+import com.dorkem.food.payment.event.PaymentEventPublisher;
 import com.dorkem.food.payment.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,30 +18,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
-	private final OrderService orderService;
 	private final PaymentRepository paymentRepository;
+	private final PaymentEventPublisher paymentEventPublisher;
 
 	@Transactional
-	public void requestPayment(String orderId) {
+	public void createPayment(String orderId, Long customerId, int orderAmount, int deliveryFee) {
 		if (paymentRepository.existsByOrderId(orderId)) {
 			throw new CommonException(ErrorCode.PAYMENT_ALREADY_EXISTS);
 		}
 
-		Order order = orderService.findOrderById(orderId);
-		Payment payment = Payment.createPayment(
-			orderId,
-			order.getCustomerId(),
-			order.getOrderAmount(),
-			order.getDeliveryFee()
-		);
+		Payment payment = Payment.createPayment(orderId, customerId, orderAmount, deliveryFee);
 		paymentRepository.save(payment);
-
-		orderService.requestPayment(orderId);
 
 		try {
 			String pgTransactionId = processMockPg(payment.getTotalAmount());
 			payment.complete(pgTransactionId);
-			orderService.completePayment(orderId);
+			paymentEventPublisher.publishPaymentCompleted(PaymentCompletedEvent.from(orderId, customerId));
 		} catch (Exception e) {
 			payment.fail();
 			throw new CommonException(ErrorCode.PAYMENT_FAILED);
@@ -52,12 +44,9 @@ public class PaymentService {
 	public void refundPayment(String orderId) {
 		Payment payment = paymentRepository.findByOrderId(orderId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_PAYMENT));
-
 		payment.refund();
-		orderService.cancelOrder(orderId);
 	}
 
-	// mock 처리
 	private String processMockPg(int amount) {
 		return "PG-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
 	}

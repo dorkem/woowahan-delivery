@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dorkem.food.common.response.ResponseDto;
+import com.dorkem.food.order.entity.Order;
+import com.dorkem.food.order.service.OrderService;
 import com.dorkem.food.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,13 +18,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController {
 
+	private final OrderService orderService;
 	private final PaymentService paymentService;
 
 	@PatchMapping("/{orderId}/request")
 	public ResponseEntity<ResponseDto<Void>> requestPayment(
 		@PathVariable String orderId
 	) {
-		paymentService.requestPayment(orderId);
+		Order order = orderService.findOrderById(orderId);
+		orderService.requestPayment(orderId);
+		paymentService.createPayment(
+			orderId,
+			order.getCustomerId(),
+			order.getOrderAmount(),
+			order.getDeliveryFee()
+		);
 		return ResponseEntity.ok(ResponseDto.ok(null));
 	}
 
