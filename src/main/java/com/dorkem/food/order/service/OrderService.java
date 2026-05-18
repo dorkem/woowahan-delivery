@@ -58,7 +58,7 @@ public class OrderService {
 		);
 		orderRepository.save(order);
 		orderEventPublisher.publishOrderCreated(
-			OrderCreatedEvent.from(order.getOrderId(), order.getCustomerId(), order.getOrderAmount(), order.getDeliveryFee())
+			OrderCreatedEvent.from(order.getOrderId(), order.getCustomerId())
 		);
 
 		return order.getOrderId();
