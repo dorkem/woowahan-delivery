@@ -13,7 +13,6 @@ import com.dorkem.food.common.exception.CommonException;
 import com.dorkem.food.common.exception.ErrorCode;
 import com.dorkem.food.store.entity.Menu;
 import com.dorkem.food.store.repository.MenuRepository;
-import com.dorkem.food.order.dto.request.DeliveryAddressRequest;
 import com.dorkem.food.order.dto.request.OrderCreateRequest;
 import com.dorkem.food.order.dto.request.OrderCreateItemRequest;
 import com.dorkem.food.order.dto.response.OrderHistoryPageResponse;
@@ -21,9 +20,9 @@ import com.dorkem.food.order.dto.response.OrderResponse;
 import com.dorkem.food.order.entity.Order;
 import com.dorkem.food.order.entity.OrderItem;
 import com.dorkem.food.order.entity.embedded.OrderCustomerSnapshot;
-import com.dorkem.food.order.entity.embedded.OrderRequirement;
 import com.dorkem.food.order.entity.embedded.OrderStoreSnapshot;
-import com.dorkem.food.order.entity.embedded.UserDeliveryInfo;
+import com.dorkem.food.order.event.OrderCreatedEvent;
+import com.dorkem.food.order.event.OrderEventPublisher;
 import com.dorkem.food.order.repository.OrderQueryRepository;
 import com.dorkem.food.order.repository.OrderRepository;
 import com.dorkem.food.store.entity.Store;
@@ -41,6 +40,7 @@ public class OrderService {
 	private final StoreRepository storeRepository;
 	private final CustomerQueryRepository customerQueryRepository;
 	private final MenuRepository menuRepository;
+	private final OrderEventPublisher orderEventPublisher;
 
 	@Transactional
 	public String createOrder(Long userId, OrderCreateRequest request) {
@@ -48,27 +48,18 @@ public class OrderService {
 		Store store = getStore(request.storeId());
 		List<OrderItem> orderItems = getOrderItems(request.items());
 
-		OrderRequirement orderRequirement = new OrderRequirement(
-			request.requestToStore(),
-			request.noCutlery(),
-			request.noSideDish()
-		);
-
-		DeliveryAddressRequest deliveryReq = request.deliveryAddressRequest();
-		UserDeliveryInfo userDeliveryInfo = new UserDeliveryInfo(
-			deliveryReq.address(),
-			deliveryReq.addressDetail(),
-			deliveryReq.requestToRider(),
-			deliveryReq.entranceAccessPassword(),
-			deliveryReq.deliveryDirections()
-		);
-
 		Order order = Order.createOrder(
 			new OrderStoreSnapshot(store.getStoreId(), store.getStoreName()),
 			new OrderCustomerSnapshot(customer.getCustomerId(), customer.getPhoneNumber()),
-			store.getBaseDeliveryFee(), orderRequirement, userDeliveryInfo, orderItems
+			store.getBaseDeliveryFee(),
+			request.toOrderRequirement(),
+			request.toUserDeliveryInfo(),
+			orderItems
 		);
 		orderRepository.save(order);
+		orderEventPublisher.publishOrderCreated(
+			OrderCreatedEvent.from(order.getOrderId(), order.getCustomerId(), order.getOrderAmount(), order.getDeliveryFee())
+		);
 
 		return order.getOrderId();
 	}
